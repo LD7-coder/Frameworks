@@ -1,0 +1,165 @@
+import SopaLetras from "../../games/sopaletrascom";
+import './Sopa.css';
+import { useEffect, useState } from "react";
+import { useRef } from "react";
+
+//La sopa deberia estar dentro de un useState para que se vaya actualizando
+let objeto = SopaLetras(["HOLA", "ADIOS", "PERRO", "GATO", "FER", "DAVID", "LUIS"], 15),
+  sopa = objeto.matriz,
+  palabras = objeto.palabras;
+
+function Sopa(){
+    const divRef = useRef([]);
+    const [bandera, setBandera] = useState(false);
+    const [letras_seleccionadas, setLetrasSeleccionadas] = useState([]);
+    const [modo, setModo] = useState("");
+    //const [palabra, setPalabra] = useState([]);
+
+    const setDivRef = (div, rowIndex, colIndex) => {
+        if(!divRef.current[rowIndex]){
+            divRef.current[rowIndex] = [];
+        }
+        divRef.current[rowIndex][colIndex] = div;
+    }
+
+    const getDivRef = (rowIndex, colIndex) => {
+        //Doble prptección en caso que las referencias no se hayan completado aún, evitamos acceder a un undefined
+        return divRef.current[rowIndex]?.[colIndex] ?? null
+    }
+
+    const handleMouseDown = (e, rowIndex, colIndex) =>{
+        const div = getDivRef(rowIndex, colIndex);
+        if(bandera == false && (div && div.contains(e.target))){
+            setBandera(true);
+            //div.style.backgroundColor = 'pink';
+        }else{
+            console.log('No existe');
+        }
+    }
+
+    const handleMouseMove = (e, rowIndex, colIndex) => {
+        const div = getDivRef(rowIndex, colIndex);
+        //Validamos si la bandera viene a true significa que el MouseDown se inicio
+        if(bandera && (div && div.contains(e.target))){
+            //div.style.backgroundColor = '#D3D3D3';
+            //Evitar guardar repetidos dentrode las palabras seleccionadas 
+            setLetrasSeleccionadas((letras_seleccionadas) => {
+                //Evitar letras repetidas, debe estar dentro de useState para evitar que la logica lea 
+                //el estado desactualizado de letras_seleccionadas 
+                if(letras_seleccionadas.length !== 0){
+                    if(!(letras_seleccionadas.some((obj) => (
+                        (obj.rowIndex === rowIndex && obj.colIndex === colIndex)
+                    )))){
+                        //console.log(letras_seleccionadas[letras_seleccionadas.length - 1])
+                        return [...letras_seleccionadas, {rowIndex: rowIndex, colIndex: colIndex, letra: getDivRef(rowIndex, colIndex).textContent}];
+                    }else{
+                        return letras_seleccionadas;
+                    }
+                }else{
+                    return [...letras_seleccionadas, {rowIndex: rowIndex, colIndex: colIndex, letra: getDivRef(rowIndex, colIndex).textContent}];
+                }
+            });
+        }else{
+            console.log('No existe');
+        }
+    }
+
+    const handleMouseUp = (e, rowIndex, colIndex) => {
+        const div = getDivRef(rowIndex, colIndex);
+        if(div && div.contains(e.target)){
+            setBandera(false);
+        }else{
+            console.log('No existe');
+        }
+    }
+
+    /*
+    *Modos*
+    -RR: REVERSO
+    -R: ROW NORMAL
+    -CR: REVERSO
+    -C: COLUMN NORMAL
+    */
+    useEffect(() => {
+        if(letras_seleccionadas.length === 1){
+            //Coloreamos
+            getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+            //console.log(letras_seleccionadas[letras_seleccionadas.length - 1])
+        }else if(letras_seleccionadas.length === 2){
+            //console.log(letras_seleccionadas[letras_seleccionadas.length - 1])
+            //console.log(letras_seleccionadas[letras_seleccionadas.length - 2])
+            if(letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex === letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex){
+                if(letras_seleccionadas[letras_seleccionadas.length - 1].colIndex < letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
+                    setModo('RR')
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }else if(letras_seleccionadas[letras_seleccionadas.length - 1].colIndex > letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
+                    setModo('R')
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }
+            }else if(letras_seleccionadas[letras_seleccionadas.length - 2].colIndex === letras_seleccionadas[letras_seleccionadas.length - 1].colIndex){
+                if(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex < letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
+                    setModo('CR')
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }else if(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex > letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
+                    setModo('C')
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }
+            }
+            /*
+            if((letras_seleccionadas[letras_seleccionadas.length - 2]?.rowIndex + 1) === letras_seleccionadas[letras_seleccionadas - 1].rowIndex){
+                console.log("YEI")
+            }
+                */
+        }
+        if(modo === 'RR'){
+            if(letras_seleccionadas[0].rowIndex === letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex){
+                console.log("Modo row-reverse")
+                //console.log(letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex)
+                if((letras_seleccionadas[letras_seleccionadas.length - 1].colIndex + 1) === letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }
+            }
+        }else if(modo === 'R'){
+            if(letras_seleccionadas[0].rowIndex === letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex){
+                console.log("Modo row")
+                //console.log(letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex)
+                if((letras_seleccionadas[letras_seleccionadas.length - 1].colIndex - 1) === letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }
+            }
+        }else if(modo === 'CR'){
+            if(letras_seleccionadas[0].colIndex === letras_seleccionadas[letras_seleccionadas.length - 1].colIndex){
+                if((letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex + 1) === letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }
+            }    
+        }else if(modo === 'C'){
+            if(letras_seleccionadas[0].colIndex === letras_seleccionadas[letras_seleccionadas.length - 1].colIndex){
+                if((letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex - 1) === letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
+                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
+                }
+            } 
+        }
+    }, [letras_seleccionadas, modo])
+
+    return(
+            <>
+                <div className="divPantalla">
+                    <div  className="divSopa" style={{gridTemplateColumns: `repeat(${sopa[0].length}, 1fr)`}}>
+                        {sopa.map((arreglo, rowKey) => (
+                            arreglo.map((item, colKey) => (
+                                <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
+                            ))
+                        ))}
+                    </div>
+                    <ul className="liPalabra">
+                        {palabras.map((item, key) => (
+                            <li key={key}>{item}</li>
+                        ))}
+                    </ul>
+                </div>
+          </>
+        );
+}
+
+export default Sopa;
