@@ -130,7 +130,9 @@ function Crucigrama(palabras, tam) {
   const matriz = CrearMatriz(tam);
   ColocarPalabras(matriz, palabras);
   MostrarMatriz(matriz);
-  return matriz;
+  return { matriz, palabras };
 }
 
 Crucigrama(["FER", "DAVID", "LUIS", "FRAMEWORKS", "SOFTWARE","LUNES","MAPACHE","CARRUSEL","HALLOWEEN"], 15);
+
+export default Crucigrama;
