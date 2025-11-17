@@ -1,0 +1,62 @@
+.divPantallaA{
+    display: flex;
+    flex-direction: column;
+    width: 1100px;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: solid rgb(0, 255, 255);
+    box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
+}
+.principal{
+    display: flex;
+    width: 1000px;
+    height: 550px;
+}
+.secundario{
+    display: flex;
+    width: 1000px;
+    height: 100px;
+    justify-content: center;
+    align-content: center;
+    gap: 5px;
+}
+.figura{
+    width: 600px;
+    height: 550px;
+}
+.letras{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    width: 400px;
+    height: 550px;
+}
+.letraA{
+    text-align: center;
+    width: 40px;
+    height: 30px;
+    border: none;
+    border-bottom: solid rgb(0, 255, 255);
+    background: transparent;
+    outline: none;
+}
+.rowL{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    width: 400px;
+    height: 50px;
+    gap: 2px;
+}
+.colL{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    width: 45px;
+    height: 40px;
+    border-radius: 5px;
+    border: solid rgb(0, 255, 255);
+}
