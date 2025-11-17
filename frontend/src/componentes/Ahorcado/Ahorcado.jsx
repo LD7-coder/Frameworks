@@ -6,7 +6,12 @@ function Ahorcado(){
     return(
         <>
             <div className='divPantallaA'>
+                <div className='divMetadatosA'>
+                    <div className='MdatoA' style={{width: "940px"}}><h1 style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
+                    <div className='MdatoA' style={{width: "60px"}}><h2 style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>09:25</h2></div>
+                </div>
                 <div className='principal'>
+                    <div className='pistaA'><p style={{color: "#0D0D0D", fontSize: "16px"}}>Este es un parrafo de prueba solo asegurandonos que las pistas si llegaran hehehe</p></div>
                     <div className='figura'></div>
                     <div className='letras'>
                         <div className='rowL'>
@@ -54,7 +59,7 @@ function Ahorcado(){
                 </div>
                 <div className='secundario'>
                     {arreglo.map((key) => (
-                        <input key={key} className='letraA'></input>
+                        <input key={key} maxLength={1} readOnly className='letraA'></input>
                     ))}
                 </div>
             </div>
