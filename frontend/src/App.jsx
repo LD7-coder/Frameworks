@@ -6,6 +6,8 @@ import File from "../src/componentes/File/File";
 import Sopa from "../src/componentes/Sopa/Sopa";
 //import Timer from "./componentes/Timer/Timer";
 
+//Este es un comando de prueba para unirme a colaborar
+
 function App() {
   return (
     <Routes>
