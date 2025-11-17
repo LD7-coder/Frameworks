@@ -74,7 +74,7 @@ function Sopa(){
     }
 
     /*
-    *Modos*
+    **Modos**
     -RR: REVERSO
     -R: ROW NORMAL
     -CR: REVERSO
@@ -143,23 +143,23 @@ function Sopa(){
     }, [letras_seleccionadas, modo])
 
     return(
-            <>
-                <div className="divPantalla">
-                    <div  className="divSopa" style={{gridTemplateColumns: `repeat(${sopa[0].length}, 1fr)`}}>
-                        {sopa.map((arreglo, rowKey) => (
-                            arreglo.map((item, colKey) => (
-                                <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
-                            ))
-                        ))}
-                    </div>
-                    <ul className="liPalabra">
-                        {palabras.map((item, key) => (
-                            <li key={key}>{item}</li>
-                        ))}
-                    </ul>
+        <>
+            <div className="divPantalla">
+                <div  className="divSopa" style={{gridTemplateColumns: `repeat(${sopa[0].length}, 1fr)`}}>
+                    {sopa.map((arreglo, rowKey) => (
+                        arreglo.map((item, colKey) => (
+                            <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
+                        ))
+                    ))}
                 </div>
-          </>
-        );
+                <ul className="liPalabra">
+                    {palabras.map((item, key) => (
+                        <li key={key}>{item}</li>
+                    ))}
+                </ul>
+            </div>
+        </>
+    );
 }
 
-export default Sopa;
+export default Sopa;
