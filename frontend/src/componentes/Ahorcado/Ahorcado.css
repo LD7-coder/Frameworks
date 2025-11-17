@@ -8,31 +8,65 @@
     gap: 10px;
     border: solid rgb(0, 255, 255);
     box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
+    border-radius: 10px;
+    background-color: #5C5C5C;
 }
+.divMetadatosA{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1000px;
+    height: 100px;
+}
+
+.MdatoA{
+    height: 65px;
+}
+
 .principal{
     display: flex;
+    align-items: center;
+    justify-content: center;
     width: 1000px;
-    height: 550px;
+    height: 450px;
+    gap: 20px;
 }
 .secundario{
     display: flex;
     width: 1000px;
     height: 100px;
     justify-content: center;
-    align-content: center;
+    align-items: center;
     gap: 5px;
 }
+/*En este div debe colocarse la actualización del cuerpo*/
 .figura{
-    width: 600px;
-    height: 550px;
+    width: 400px;
+    height: 450px;
+    color: #0D0D0D;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.6),0 0 8px rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+}
+.pistaA{
+    display: flex;
+    align-items: center;
+    width: 350px;
+    height: 150px;
+    border: solid #39FF14;
+    background-color: #C8FFC4;
+    box-shadow:
+    0 0 6px rgba(57, 255, 20, 0.7),
+    0 0 12px rgba(57, 255, 20, 0.45),
+    0 0 18px rgba(57, 255, 20, 0.3);
+    border-radius: 10px;
 }
 .letras{
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-content: center;
-    width: 400px;
-    height: 550px;
+    align-items: center;
+    width: 200px;
+    height: 450px;
 }
 .letraA{
     text-align: center;
@@ -49,14 +83,20 @@
     align-content: center;
     width: 400px;
     height: 50px;
-    gap: 2px;
+    gap: 5px;
 }
 .colL{
     display: flex;
     justify-content: center;
-    align-content: center;
+    align-items: center;
     width: 45px;
     height: 40px;
     border-radius: 5px;
     border: solid rgb(0, 255, 255);
+    color: #0D0D0D;
+    background-color: #A3EEEE;
+}
+.colL:hover{
+    border: solid rgb(0, 255, 255);
+    box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
 }
