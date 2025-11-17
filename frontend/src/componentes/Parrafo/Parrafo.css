@@ -1,0 +1,33 @@
+.divPantallaP{
+    display: flex;
+    width: 1100px;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+.palabrasB{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 550px;
+    border: solid rgb(0, 255, 255);
+    box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
+    border-radius: 10px;
+    gap: 5px;
+}
+.divParrafo{
+    width: 700px;
+    height: 550px;
+    border: solid rgb(0, 255, 255);
+    box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
+    border-radius: 10px;
+}
+.palabraB{
+    width: 150px;
+    height: 40px;
+    border-radius: 5px;
+    border: solid rgb(0, 255, 255);
+}
