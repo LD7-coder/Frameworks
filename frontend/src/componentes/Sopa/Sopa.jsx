@@ -145,18 +145,24 @@ function Sopa(){
     return(
         <>
             <div className="divPantalla">
-                <div  className="divSopa" style={{gridTemplateColumns: `repeat(${sopa[0].length}, 1fr)`}}>
-                    {sopa.map((arreglo, rowKey) => (
-                        arreglo.map((item, colKey) => (
-                            <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
-                        ))
-                    ))}
+                <div className="divMetadatosS">
+                    <div style={{width: "595px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
+                    <div style={{width: "310px"}}><h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>09:25</h2></div>
                 </div>
-                <ul className="liPalabra">
-                    {palabras.map((item, key) => (
-                        <li key={key}>{item}</li>
-                    ))}
-                </ul>
+                <div className="divSecundario">
+                    <div  className="divSopa" style={{gridTemplateColumns: `repeat(${sopa[0].length}, 1fr)`}}>
+                        {sopa.map((arreglo, rowKey) => (
+                            arreglo.map((item, colKey) => (
+                                <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
+                            ))
+                        ))}
+                    </div>
+                    <div className="liPalabra">
+                        {palabras.map((item, key) => (
+                            <div key={key} className="palabraS"><h3>{item}</h3></div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </>
     );
