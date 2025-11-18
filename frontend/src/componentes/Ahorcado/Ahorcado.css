@@ -39,7 +39,6 @@
     align-items: center;
     gap: 5px;
 }
-/*En este div debe colocarse la actualización del cuerpo*/
 .figura{
     width: 400px;
     height: 450px;
@@ -99,4 +98,21 @@
 .colL:hover{
     border: solid rgb(0, 255, 255);
     box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
+}
+
+.incorrecta {
+    background-color: #ff4c4c !important;
+    color: white !important;
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+.correcta {
+    background-color: #39FF14 !important; 
+    color: #0D0D0D !important;
+    box-shadow:
+        0 0 6px rgba(57, 255, 20, 0.7),
+        0 0 12px rgba(57, 255, 20, 0.45),
+        0 0 18px rgba(57, 255, 20, 0.3);
+    cursor: not-allowed;
 }

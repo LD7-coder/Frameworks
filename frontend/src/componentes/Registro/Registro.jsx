@@ -75,7 +75,7 @@ function Registro() {
             return;
           }
           if (!validarPassword(password)) {
-            alert("Contraseña inválida:\nDebe ser de 10 a 15 caracteres y puede contener caracteres especiales.");
+            alert("Contraseña inválida:\nDebe ser de 10 a 15 caracteres");
             return;
           }
 
