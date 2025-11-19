@@ -72,9 +72,6 @@
     border-bottom: 3px solid #00FFFF;
     background-color: rgba(0, 255, 255, 0.12);
     border-radius: 6px;
-    box-shadow:
-        0 0 6px #00FFFF,
-        0 0 12px #00FFFF;
     outline: none;
 }
 
