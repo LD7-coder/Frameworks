@@ -18,6 +18,7 @@ function App() {
       <Route path="/registro" element={<Registro />} />
       <Route path="/home" element={<Home />} />
       <Route path="/file" element={<File />}></Route>
+      <Route path="/ahorcado" element={<Ahorcado />} />
     </Routes>
   );
 }
