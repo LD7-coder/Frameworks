@@ -27,7 +27,6 @@ function Colocar(matriz, matrizIniciales, palabra, x, y, dir) {
 
     if (matriz[nx][ny] === "") {
       matriz[nx][ny] = letraNueva;
-      if (esInicialNueva) matrizIniciales[nx][ny] = true;
     } else {
       const letraExistente = matriz[nx][ny];
       const esInicialExistente = matrizIniciales[nx][ny];
@@ -36,6 +35,8 @@ function Colocar(matriz, matrizIniciales, palabra, x, y, dir) {
         matriz[nx][ny] = letraExistente + letraNueva; 
       }
     }
+
+    if (esInicialNueva) matrizIniciales[nx][ny] = true;
   } 
 }
 
@@ -81,7 +82,6 @@ function ColocarConCruce(matriz, matrizIniciales, palabra, x, y, dir, indicePala
 
     if (matriz[nx][ny] === "") {
       matriz[nx][ny] = letraNueva;
-      if (esInicialNueva) matrizIniciales[nx][ny] = true;
     } else {
       const letraExistente = matriz[nx][ny];
       const esInicialExistente = matrizIniciales[nx][ny];
@@ -90,6 +90,8 @@ function ColocarConCruce(matriz, matrizIniciales, palabra, x, y, dir, indicePala
         matriz[nx][ny] = letraExistente + letraNueva; 
       }
     }
+
+    if (esInicialNueva) matrizIniciales[nx][ny] = true;
   } 
 }
 
@@ -145,30 +147,16 @@ function ColocarPalabras(matriz, matrizIniciales, palabras) {
   } 
 }
 
-function CapitalizarIniciales(matriz) {
+function CapitalizarIniciales(matriz, matrizIniciales) {
   const n = matriz.length;
-  const fix = s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-
   for (let x = 0; x < n; x++) {
     for (let y = 0; y < n; y++) {
       const c = matriz[x][y];
       if (c === "") continue;
-      const prevEmptyH = y - 1 < 0 || matriz[x][y - 1] === "";
-      const nextFilledH = y + 1 < n && matriz[x][y + 1] !== "";
-      if (prevEmptyH && nextFilledH) {
-        matriz[x][y] = fix(c);
-      }
-    }
-  }
-
-  for (let x = 0; x < n; x++) {
-    for (let y = 0; y < n; y++) {
-      const c = matriz[x][y];
-      if (c === "") continue;
-      const prevEmptyV = x - 1 < 0 || matriz[x - 1][y] === "";
-      const nextFilledV = x + 1 < n && matriz[x + 1][y] !== "";
-      if (prevEmptyV && nextFilledV) {
-        matriz[x][y] = fix(c);
+      if (matrizIniciales[x][y]) {
+        matriz[x][y] = c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
+      } else {
+        matriz[x][y] = c.toLowerCase();
       }
     }
   }
@@ -178,11 +166,11 @@ function Crucigrama(palabras, tam) {
   const matriz = CrearMatriz(tam); 
   const matrizIniciales = CrearMatrizIniciales(tam);
   ColocarPalabras(matriz, matrizIniciales, palabras); 
-  CapitalizarIniciales(matriz); 
+  CapitalizarIniciales(matriz, matrizIniciales);
   MostrarMatriz(matriz); 
   return { matriz, palabras }; 
 }
 
-Crucigrama(["FER", "DAVID", "LUIS", "FRAMEWORKS", "SOFTWARE","LUNES","MAPACHE","CARRUSEL","HALLOWEEN"], 15); 
+Crucigrama(["MARTIN","FER", "DAVID", "LUIS", "FRAMEWORKS", "SOFTWARE","LUNES","MAPACHE","CARRUSEL","HALLOWEEN"], 20); 
 
 export default Crucigrama;
