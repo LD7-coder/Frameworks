@@ -7,6 +7,7 @@ import Sopa from "../src/componentes/Sopa/Sopa";
 import Crucigrama from "../src/componentes/Crucigrama/Crucigrama";
 import Ahorcado from "../src/componentes/Ahorcado/Ahorcado";
 import Parrafo from "../src/componentes/Parrafo/Parrafo";
+import Popup from "./componentes/Popup/Popup";
 //import Timer from "./componentes/Timer/Timer";
 
 //Este es un comando de prueba para unirme a colaborar

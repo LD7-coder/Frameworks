@@ -6,14 +6,20 @@ import { useRef } from "react";
 //La sopa deberia estar dentro de un useState para que se vaya actualizando
 let objeto = SopaLetras(["HOLA", "ADIOS", "PERRO", "GATO", "FER", "DAVID", "LUIS"], 15),
   sopa = objeto.matriz,
-  palabras = objeto.palabras;
+  palabras = objeto.palabras,
+  colores = ["#FFF9A6", "#FFB3B3", "#D7B7FF", "#AEE6FF", "#BFFFC8", "#FFD8A8", "#FFC0D9", "#B8FFE0"],
+  minutos = 9,
+  segundos = 39;
+
 
 function Sopa(){
     const divRef = useRef([]);
+    const divL = useRef([]);
     const [bandera, setBandera] = useState(false);
+    const [finalizar, setFinalizar] = useState(true);
     const [letras_seleccionadas, setLetrasSeleccionadas] = useState([]);
     const [modo, setModo] = useState("");
-    //const [palabra, setPalabra] = useState([]);
+    //const [correctas, setCorrectas] = useState(palabras);
 
     const setDivRef = (div, rowIndex, colIndex) => {
         if(!divRef.current[rowIndex]){
@@ -22,9 +28,17 @@ function Sopa(){
         divRef.current[rowIndex][colIndex] = div;
     }
 
+    const setDivL = (div, rowIndex) => {
+        divL.current[rowIndex] = div;
+    }
+
     const getDivRef = (rowIndex, colIndex) => {
         //Doble prptección en caso que las referencias no se hayan completado aún, evitamos acceder a un undefined
         return divRef.current[rowIndex]?.[colIndex] ?? null
+    }
+
+    const getDivL = (rowIndex) => {
+        return divL.current[rowIndex] ?? null
     }
 
     const handleMouseDown = (e, rowIndex, colIndex) =>{
@@ -68,6 +82,7 @@ function Sopa(){
         const div = getDivRef(rowIndex, colIndex);
         if(div && div.contains(e.target)){
             setBandera(false);
+            setFinalizar(false);
         }else{
             console.log('No existe');
         }
@@ -142,24 +157,58 @@ function Sopa(){
         }
     }, [letras_seleccionadas, modo])
 
+    useEffect(() => {
+        if(finalizar === false){
+            console.log(letras_seleccionadas)
+            let palabraC = ""; 
+            letras_seleccionadas.forEach(l => {
+                palabraC += l.letra;
+            });
+            console.log(palabraC)
+            let indexC = palabras.findIndex(p => p === palabraC)
+            console.log(indexC)
+            if(indexC > -1){
+                console.log("confirmación")
+                letras_seleccionadas.forEach((l) => {
+                    console.log(colores[indexC])
+                    getDivRef(l.rowIndex, l.colIndex).style.backgroundColor = `${colores[indexC]}`;
+                    getDivL(indexC).style.backgroundColor = '#C8FFC4';
+                    getDivL(indexC).style.borderColor = '#39FF14';
+                })
+            }
+            if(indexC === -1){
+                console.log("ando aqui")
+                letras_seleccionadas.forEach((l) => {
+                    getDivRef(l.rowIndex, l.colIndex).style.backgroundColor = '#5C5C5C';
+                })
+            }
+            setLetrasSeleccionadas([])
+            setFinalizar(true)
+            setModo("")
+        }
+    }, [finalizar, letras_seleccionadas, modo])
+
     return(
         <>
             <div className="divPantalla">
                 <div className="divMetadatosS">
-                    <div style={{width: "595px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
-                    <div style={{width: "310px"}}><h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>09:25</h2></div>
+                    <div style={{width: "405px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
+                    <div style={{width: "500", display: "flex", justifyContent: "center", alignItems: "center", gap: "20px"}}>
+                        <h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{minutos}:${segundos}</h2>
+                        <button className="Bsalir" style={{color: "#0D0D0D"}}>Salir</button>
+                    </div>
                 </div>
                 <div className="divSecundario">
                     <div  className="divSopa" style={{gridTemplateColumns: `repeat(${sopa[0].length}, 1fr)`}}>
                         {sopa.map((arreglo, rowKey) => (
                             arreglo.map((item, colKey) => (
-                                <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
+                                <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0D0D0D'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
                             ))
                         ))}
                     </div>
                     <div className="liPalabra">
                         {palabras.map((item, key) => (
-                            <div key={key} className="palabraS"><h3>{item}</h3></div>
+                            (<div key={key} ref={(div) => setDivL(div, key)}  className="palabraS"><h3>{item}</h3></div>)
                         ))}
                     </div>
                 </div>

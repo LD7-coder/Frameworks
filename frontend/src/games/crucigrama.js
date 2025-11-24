@@ -133,6 +133,4 @@ function Crucigrama(palabras, tam) {
   return { matriz, palabras };
 }
 
-Crucigrama(["FER", "DAVID", "LUIS", "FRAMEWORKS", "SOFTWARE","LUNES","MAPACHE","CARRUSEL","HALLOWEEN"], 15);
-
 export default Crucigrama;

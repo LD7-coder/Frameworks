@@ -48,6 +48,7 @@
     box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
     border-radius: 10px;
     background-color: #5C5C5C;
+    gap: 190px;
 }
 .divPantalla{
     display: flex;
@@ -66,10 +67,24 @@
     justify-content: center;
     gap: 50px;
 }
-
 .MdatoS{
     display: flex;
     justify-content: center;
     align-items: center;
     height: 65px;
+}
+.Bsalir{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 50px;
+    background-color: #FFC8C4;
+    border: solid #FF1439;
+}
+.Bsalir:hover{
+    border: solid #FF1439;
+    box-shadow: 0 0 10px rgba(255, 59, 59, 0.6),
+            0 0 20px rgba(255, 59, 59, 0.4),
+            0 0 30px rgba(255, 59, 59, 0.2);
 }
