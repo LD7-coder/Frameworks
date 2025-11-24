@@ -73,16 +73,15 @@ app.post("/api/analyze-pdf", upload.single("pdfFile"), async (req, res) => {
 
     const prompt = `
       A partir del contenido del PDF, responde ÚNICAMENTE con código JavaScript válido.
-      No incluyas explicaciones, ni texto adicional, ni comillas de plantilla. IMPORTANTE: NO INCLUYAS
-      ACENTOS NI "Ñ" EN LAS RESPUESTAS
+      No incluyas explicaciones, ni texto adicional, ni comillas de plantilla. 
 
       Genera las siguientes constantes:
 
-      juego1: arreglo con [palabraClave, pista]
-      juego2: arreglo de 8 palabras clave
-      juego3: matriz 8x2 con [[palabra, pista], ...]
+      juego1: arreglo con [palabraClave, pista] - NO INCLUYAS ACENTOS
+      juego2: arreglo de 8 palabras clave - NO INCLUYAS NUMEROS
+      juego3: matriz 8x2 con [[palabra, pista], ...] - NO INCLUYAS NUMEROS
       juego4: arreglo donde el primer valor es un párrafo completo y los siguientes 5 valores
-      son 5 palabras clave dentro del párrafo
+      son 5 palabras clave dentro del párrafo 
 
       Formato:
       const juego1 = [...];
@@ -120,11 +119,11 @@ app.post("/api/analyze-pdf", upload.single("pdfFile"), async (req, res) => {
       crucigrama: scope.juego3,
       completarFrase: scope.juego4,
     };
+    console.log("Ahorcado:", scope.juego1);
+    console.log("Sopa de letras:", scope.juego2);
+    console.log("Crucigrama:", scope.juego3);
+    console.log("Completar frase:", scope.juego4);
 
-    console.log("Juego 1 (ahorcado):", scope.juego1);
-    console.log("Juego 2 (sopa de letras):", scope.juego2);
-    console.log("Juego 3 (crucigrama):", scope.juego3);
-    console.log("Juego 4 (completar frase):", scope.juego4);
     return res.status(200).json(finalData);
 
   } catch (error) {

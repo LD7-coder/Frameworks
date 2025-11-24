@@ -13,7 +13,7 @@ import img7 from "../../Imagenes/Ahorcado7.jpg";
 
 function Ahorcado() {
     const location = useLocation();
-    const [palabra, pista] = location.state;   // ← aquí recibes [palabra, pista]
+    const [palabra, pista] = location.state;   
 
     const imagenes = [img1, img2, img3, img4, img5, img6, img7];
 

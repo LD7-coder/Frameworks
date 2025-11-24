@@ -1,116 +1,144 @@
 import './Parrafo.css';
 import { useState, useEffect, useRef } from 'react';
-import { parrafoOriginal, palabrasCorrectas } from "../../games/parrafo";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Parrafo() {
-    const total = palabrasCorrectas.length;
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    const [selecciones, setSelecciones] = useState(Array(total).fill("")); 
-    const [resultado, setResultado] = useState(null); 
-    const [palabrasDisponibles, setPalabrasDisponibles] = useState(
-        shuffleArray([...palabrasCorrectas]) 
-    );
+    const data = location.state;
 
-    const actSeg = useRef(0);
-    const actMin = useRef(0);
-    const intervalo = useRef(null);
-    
-    const [seg, setSeg] = useState(0);
-    const [min, setMin] = useState(0);
-
-    //Intervalo creado cuando se monta el componente
-    useEffect(()=>{
-        console.log("Hola, estoy existiendo")
-        intervalo.current = setInterval(() => {
-            if(actSeg.current === 60){
-                actSeg.current = 0
-                setSeg(actSeg.current); 
-                actMin.current += 1
-                setMin(actMin.current); 
-            }else{
-                actSeg.current += 1
-                setSeg(actSeg.current); 
-            }
-        }, 1100);
-
-        //Función que detiene la ejecución en cuanto se desmonta el componente
-        return () => {
-            clearInterval(intervalo.current)
-        };
-
+    // Si alguien entra directo sin PDF
+    useEffect(() => {
+        if (!data) navigate("/file");
     }, []);
 
+    if (!data) return null;
+
+    // -----------------------------------------
+    // 🟢 data[0] = párrafo completo
+    // 🟢 data[1..n] = palabras correctas
+    // -----------------------------------------
+    const textoOriginal = data[0];
+    const palabrasCorrectas = data.slice(1);
+    const total = palabrasCorrectas.length;
+
+    // Quitar palabras y reemplazar por ___
+    function generarParrafoConHuecos(texto, palabras) {
+        let mod = texto;
+        palabras.forEach(p => {
+            const regex = new RegExp(`\\b${p}\\b`, "i");
+            mod = mod.replace(regex, "___");
+        });
+        return mod;
+    }
+
+    const parrafoProcesado = generarParrafoConHuecos(textoOriginal, palabrasCorrectas);
+
+    const [selecciones, setSelecciones] = useState(Array(total).fill(""));
+    const [resultado, setResultado] = useState(null);
+
+    // Mezclar palabras
     function shuffleArray(arr) {
         return arr.sort(() => Math.random() - 0.5);
     }
 
-    function seleccionarPalabra(palabra) {
-        const indexVacio = selecciones.indexOf("");
+    const [palabrasDisponibles, setPalabrasDisponibles] = useState(
+        shuffleArray([...palabrasCorrectas])
+    );
 
-        if (indexVacio === -1) return;
+    // ----------------- RELOJ -----------------
+    const actSeg = useRef(0);
+    const actMin = useRef(0);
+    const intervalo = useRef(null);
+
+    const [seg, setSeg] = useState(0);
+    const [min, setMin] = useState(0);
+
+    useEffect(() => {
+        intervalo.current = setInterval(() => {
+            if (actSeg.current === 60) {
+                actSeg.current = 0;
+                setSeg(actSeg.current);
+                actMin.current += 1;
+                setMin(actMin.current);
+            } else {
+                actSeg.current += 1;
+                setSeg(actSeg.current);
+            }
+        }, 1100);
+
+        return () => clearInterval(intervalo.current);
+    }, []);
+
+    // -----------------------------------------
+    // 🟢 Colocar palabra en el siguiente hueco libre
+    // -----------------------------------------
+    function seleccionarPalabra(palabra) {
+        const index = selecciones.indexOf("");
+
+        if (index === -1) return;
 
         const nuevo = [...selecciones];
-        nuevo[indexVacio] = palabra;
+        nuevo[index] = palabra;
 
         setSelecciones(nuevo);
-
-        setPalabrasDisponibles(prev =>
-            prev.filter(p => p !== palabra)
-        );
+        setPalabrasDisponibles(prev => prev.filter(p => p !== palabra));
     }
 
-    function revisar() {
-        let correctas = 0;
-
-        selecciones.forEach((p, i) => {
-            if (p === palabrasCorrectas[i]) correctas++;
-        });
-
-        setResultado(correctas);
-    }
-
-    function quitarPalabra(indexHueco) {
-        const palabraQuitada = selecciones[indexHueco];
-
+    // -----------------------------------------
+    // 🟢 Quitar palabra colocada
+    // -----------------------------------------
+    function quitarPalabra(i) {
+        const palabraQuitada = selecciones[i];
         if (!palabraQuitada) return;
 
         const nuevo = [...selecciones];
-        nuevo[indexHueco] = "";
-        setSelecciones(nuevo);
+        nuevo[i] = "";
 
+        setSelecciones(nuevo);
         setPalabrasDisponibles(prev => [...prev, palabraQuitada]);
     }
 
+    // -----------------------------------------
+    // 🟢 Revisar respuestas
+    // -----------------------------------------
+    function revisar() {
+        let correctas = 0;
+        selecciones.forEach((p, i) => {
+            if (p === palabrasCorrectas[i]) correctas++;
+        });
+        setResultado(correctas);
+    }
+
+    // -----------------------------------------
+    // 🟢 Renderizar texto con huecos
+    // -----------------------------------------
     function renderParrafo() {
-        let partes = parrafoOriginal.split("___");
-        let final = [];
+        const partes = parrafoProcesado.split("___");
+        const final = [];
 
         for (let i = 0; i < partes.length; i++) {
-            final.push(<span key={"t"+i}>{partes[i]}</span>);
+            final.push(<span key={"t" + i}>{partes[i]}</span>);
 
-            if (i < selecciones.length) {
+            if (i < total) {
                 final.push(
-                    <span 
-                        key={"e"+i} 
+                    <span
+                        key={"e" + i}
                         className="hueco"
                         onClick={() => quitarPalabra(i)}
-                        title="Click para quitar"
                     >
                         {selecciones[i] || "_____"}
-
                     </span>
                 );
             }
         }
-
         return final;
     }
 
     return (
-    <>
-        <div className='divPantallaP'> 
-
-            <div className='divMetadatos'> 
+        <div className='divPantallaP'>
+            <div className='divMetadatos'>
                 <div className='Mdato'>
                     <h2 className='tPalabras'>
                         Palabras: {resultado ?? selecciones.filter(s => s).length}/{total}
@@ -122,38 +150,25 @@ function Parrafo() {
                 </div>
 
                 <div className='Mdato'>
-                    <h2>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
+                    <h2>{min >= 10 ? min : `0${min}`}:{seg >= 10 ? seg : `0${seg}`}</h2>
                 </div>
             </div>
 
             <div className='divGame'>
-                
                 <div className='palabrasB'>
                     {palabrasDisponibles.map((p, i) => (
-                        <button 
-                            key={i} 
-                            className='palabraB' 
-                            onClick={() => seleccionarPalabra(p)}
-                        >
+                        <button key={i} className='palabraB' onClick={() => seleccionarPalabra(p)}>
                             {p}
                         </button>
                     ))}
                 </div>
 
                 <div className='divParrafo'>
-                    
-                    <div className="contenedor-blanco">
-                        <p className="historia-texto">
-                            {renderParrafo()}
-                        </p>
+                    <div className='contenedor-blanco'>
+                        <p className='historia-texto'>{renderParrafo()}</p>
                     </div>
 
-                    <button 
-                        className='btnRevisar btn-revisar'
-                        onClick={revisar}
-                    >
-                        Revisar
-                    </button>
+                    <button className='btnRevisar btn-revisar' onClick={revisar}>Revisar</button>
 
                     {resultado !== null && (
                         <h2 style={{ marginTop: "10px", color: "white" }}>
@@ -161,12 +176,9 @@ function Parrafo() {
                         </h2>
                     )}
                 </div>
-
             </div>
         </div>
-    </>
-)
-
+    );
 }
 
 export default Parrafo;
