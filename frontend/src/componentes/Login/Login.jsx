@@ -24,7 +24,7 @@ function Login() {
           return;
         }
         alert("Login exitoso");
-        navigate("/home");
+        navigate("/file");
       })
       .catch((err) => {
         console.error(err);
