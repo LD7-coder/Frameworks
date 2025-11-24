@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { AhorcadoGame } from "../../games/ahorcado";
 import "./Ahorcado.css";
 
@@ -11,9 +12,12 @@ import img6 from "../../Imagenes/Ahorcado6.jpg";
 import img7 from "../../Imagenes/Ahorcado7.jpg";
 
 function Ahorcado() {
+    const location = useLocation();
+    const [palabra, pista] = location.state;   // ← aquí recibes [palabra, pista]
+
     const imagenes = [img1, img2, img3, img4, img5, img6, img7];
 
-    const [juego] = useState(new AhorcadoGame("PROCESADORES"));
+    const [juego] = useState(new AhorcadoGame(palabra));
     const [oculta, setOculta] = useState(juego.obtenerPalabraOculta());
     const [estado, setEstado] = useState("jugando");
     const [usadas, setUsadas] = useState({});
@@ -43,35 +47,27 @@ function Ahorcado() {
                         <h1
                             style={{
                                 color: "#FFFF33",
-                                textShadow:
-                                    "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"
+                                textShadow: "0 0 3px rgb(216,191,255), 0 0 6px rgb(216,191,255)"
                             }}
                         >
-                            Matematicas
+                            Ahorcado
                         </h1>
                     </div>
 
                     <div className='MdatoA' style={{ width: "60px" }}>
-                        <h2
-                            style={{
-                                textShadow:
-                                    "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"
-                            }}
-                        >
-                            09:25
-                        </h2>
+                        <h2 style={{ textShadow: "0 0 3px #fff" }}>09:25</h2>
                     </div>
                 </div>
 
                 <div className='principal'>
+
                     <div className='pistaA'>
                         <p style={{ color: "#0D0D0D", fontSize: "16px" }}>
-                            Este es un parrafo de prueba solo asegurándonos que las
-                            pistas sí lleguen hehe
+                            {pista}
                         </p>
                     </div>
 
-                   <div className='figura'>
+                    <div className='figura'>
                         <img src={imagenMostrada} alt="Ahorcado" />
                     </div>
 
@@ -86,8 +82,7 @@ function Ahorcado() {
                                             disabled={!!usadas[l]}
                                             className={`colL 
                                                 ${usadas[l] === "correcta" ? "correcta" : ""} 
-                                                ${usadas[l] === "incorrecta" ? "incorrecta" : ""}
-                                            `}
+                                                ${usadas[l] === "incorrecta" ? "incorrecta" : ""}`}
                                         >
                                             {l}
                                         </button>

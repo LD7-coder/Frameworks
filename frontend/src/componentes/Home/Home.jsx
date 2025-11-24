@@ -3,29 +3,47 @@ import imgSopa from "../../assets/sopaLetras.png";
 import imgAhorcado from "../../assets/elAhorcado.png";
 import imgFrase from "../../assets/completaFrase.png";
 import imgCombo from "../../assets/comboTres.png";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const Home = () =>{
-    const setLink = useNavigate();
+const Home = () => {
+    const navigate = useNavigate();
+    const [finalData, setFinalData] = useState(null);
 
-    return(
+    useEffect(() => {
+        const data = localStorage.getItem("finalData");
+        if (!data) {
+            navigate("/file");   
+        } else {
+            setFinalData(JSON.parse(data));
+        }
+    }, []);
+
+    if (!finalData) return null; 
+
+    return (
         <div className="contenedor-home">
             <h1>WELCOME</h1>
             <h3>¡Selecciona un juego!</h3>
+
             <div className="juegos">
-                <div onClick={() => setLink("/file")}>
+
+                <div onClick={() => navigate("/sopa", { state: finalData.sopaDeLetras })}>
                     <img src={imgSopa} alt="SopaLetras" />
                 </div>
-                <div onClick={() => setLink("/file")}>
-                    <img src={imgAhorcado} alt="Ahorcado"/>
+
+                <div onClick={() => navigate("/ahorcado", { state: finalData.ahorcado })}>
+                    <img src={imgAhorcado} alt="Ahorcado" />
                 </div>
-                <div onClick={() => setLink("/file")}>
-                    <img src={imgFrase} alt="Frase"/>
+
+                <div onClick={() => navigate("/parrafo", { state: finalData.completarFrase })}>
+                    <img src={imgFrase} alt="Frase" />
                 </div>
-                <div onClick={() => setLink("/file")}>
-                    <img src={imgCombo} alt="Frase"/>
+
+                <div onClick={() => navigate("/crucigrama", { state: finalData.crucigrama })}>
+                    <img src={imgCombo} alt="Crucigrama" />
                 </div>
+
             </div>
         </div>
     );
