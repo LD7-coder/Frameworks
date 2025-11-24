@@ -2,24 +2,52 @@ import SopaLetras from "../../games/sopaletrascom";
 import './Sopa.css';
 import { useEffect, useState } from "react";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 //La sopa deberia estar dentro de un useState para que se vaya actualizando
 let objeto = SopaLetras(["HOLA", "ADIOS", "PERRO", "GATO", "FER", "DAVID", "LUIS"], 15),
   sopa = objeto.matriz,
   palabras = objeto.palabras,
-  colores = ["#FFF9A6", "#FFB3B3", "#D7B7FF", "#AEE6FF", "#BFFFC8", "#FFD8A8", "#FFC0D9", "#B8FFE0"],
-  minutos = 9,
-  segundos = 39;
+  colores = ["#FFF9A6", "#FFB3B3", "#D7B7FF", "#AEE6FF", "#BFFFC8", "#FFD8A8", "#FFC0D9", "#B8FFE0"];
 
 
 function Sopa(){
+    const actSeg = useRef(0);
+    const actMin = useRef(0);
+    const intervalo = useRef(null);
     const divRef = useRef([]);
     const divL = useRef([]);
+    const setLink = useNavigate();
+
     const [bandera, setBandera] = useState(false);
     const [finalizar, setFinalizar] = useState(true);
     const [letras_seleccionadas, setLetrasSeleccionadas] = useState([]);
     const [modo, setModo] = useState("");
+    const [min, setMin] = useState(0);
+    const [seg, setSeg] = useState(0);
     //const [correctas, setCorrectas] = useState(palabras);
+
+    //Intervalo creado cuando se monta el componente
+    useEffect(()=>{
+        console.log("Hola, estoy existiendo")
+        intervalo.current = setInterval(() => {
+            if(actSeg.current === 60){
+                actSeg.current = 0
+                setSeg(actSeg.current); 
+                actMin.current += 1
+                setMin(actMin.current); 
+            }else{
+                actSeg.current += 1
+                setSeg(actSeg.current); 
+            }
+        }, 1100);
+
+        //Función que detiene la ejecución en cuanto se desmonta el componente
+        return () => {
+            clearInterval(intervalo.current)
+        };
+
+    }, []);
 
     const setDivRef = (div, rowIndex, colIndex) => {
         if(!divRef.current[rowIndex]){
@@ -194,8 +222,8 @@ function Sopa(){
                 <div className="divMetadatosS">
                     <div style={{width: "405px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
                     <div style={{width: "500", display: "flex", justifyContent: "center", alignItems: "center", gap: "20px"}}>
-                        <h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{minutos}:${segundos}</h2>
-                        <button className="Bsalir" style={{color: "#0D0D0D"}}>Salir</button>
+                        <h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
+                        <button className="Bsalir" style={{color: "#0D0D0D"}} onClick={() => {setLink("/home")}}>Salir</button>
                     </div>
                 </div>
                 <div className="divSecundario">

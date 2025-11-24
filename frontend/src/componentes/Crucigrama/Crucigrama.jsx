@@ -1,12 +1,11 @@
 import CrucigramaGame from "../../games/crucigrama";
 import './Crucigrama.css';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 //import { useRef } from "react";
 
 let objeto = CrucigramaGame(["FER", "DAVID", "LUIS", "FRAMEWORKS", "SOFTWARE","LUNES","MAPACHE","CARRUSEL","HALLOWEEN"], 15),
-  crucigrama = objeto.matriz,
-  minutos = 9,
-  segundos = 38;
+  crucigrama = objeto.matriz;
+
 
 let pistas = [
     "1. Lorem Ipsum is simply dummy text of the printing and typesetting industry", 
@@ -50,12 +49,43 @@ palabras_prueba.forEach((item, index)=>{
 
 function Crucigrama(){
     const [palabrasIngresadas, setIngresadas] = useState(palabras_ingresadas);
+    const actSeg = useRef(0);
+    const actMin = useRef(0);
+    const intervalo = useRef(null);
+    
+    const [seg, setSeg] = useState(0);
+    const [min, setMin] = useState(0);
+
     let c = 0;
+
+    //Intervalo creado cuando se monta el componente
+    useEffect(()=>{
+        console.log("Hola, estoy existiendo")
+        intervalo.current = setInterval(() => {
+            if(actSeg.current === 60){
+                actSeg.current = 0
+                setSeg(actSeg.current); 
+                actMin.current += 1
+                setMin(actMin.current); 
+            }else{
+                actSeg.current += 1
+                setSeg(actSeg.current); 
+            }
+        }, 1100);
+
+        //Función que detiene la ejecución en cuanto se desmonta el componente
+        return () => {
+            clearInterval(intervalo.current)
+        };
+
+    }, []);
 
     useEffect(()=>{
         console.log("pasamos")
         console.log(palabrasIngresadas)
-    }, [palabrasIngresadas])
+    }, [palabrasIngresadas]);
+
+
     return(
         <>
             <div className="divPantallaC">
@@ -83,7 +113,7 @@ function Crucigrama(){
                     <div className="divMetadatosC">
                         <div style={{width: "330px"}}><h1 className="MdatoC" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
                         <div style={{width: "370px", display: "flex", gap: "20px", alignItems: "center"}}>
-                            <h2 className="MdatoC" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{minutos}:{segundos}</h2>
+                            <h2 className="MdatoC" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
                             <button className="Bcomprobar" style={{color: "#0D0D0D"}}>Comprobar</button>
                             <button className="Bsalir" style={{color: "#0D0D0D"}}>Salir</button>
                         </div>

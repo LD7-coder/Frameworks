@@ -1,5 +1,5 @@
 import './Parrafo.css';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { parrafoOriginal, palabrasCorrectas } from "../../games/parrafo";
 
 function Parrafo() {
@@ -10,6 +10,35 @@ function Parrafo() {
     const [palabrasDisponibles, setPalabrasDisponibles] = useState(
         shuffleArray([...palabrasCorrectas]) 
     );
+
+    const actSeg = useRef(0);
+    const actMin = useRef(0);
+    const intervalo = useRef(null);
+    
+    const [seg, setSeg] = useState(0);
+    const [min, setMin] = useState(0);
+
+    //Intervalo creado cuando se monta el componente
+    useEffect(()=>{
+        console.log("Hola, estoy existiendo")
+        intervalo.current = setInterval(() => {
+            if(actSeg.current === 60){
+                actSeg.current = 0
+                setSeg(actSeg.current); 
+                actMin.current += 1
+                setMin(actMin.current); 
+            }else{
+                actSeg.current += 1
+                setSeg(actSeg.current); 
+            }
+        }, 1100);
+
+        //Función que detiene la ejecución en cuanto se desmonta el componente
+        return () => {
+            clearInterval(intervalo.current)
+        };
+
+    }, []);
 
     function shuffleArray(arr) {
         return arr.sort(() => Math.random() - 0.5);
@@ -93,7 +122,7 @@ function Parrafo() {
                 </div>
 
                 <div className='Mdato'>
-                    <h2>09:20</h2>
+                    <h2>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
                 </div>
             </div>
 

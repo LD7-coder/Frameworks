@@ -3,7 +3,6 @@ import imgSopa from "../../assets/sopaLetras.png";
 import imgAhorcado from "../../assets/elAhorcado.png";
 import imgFrase from "../../assets/completaFrase.png";
 import imgCombo from "../../assets/comboTres.png";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const Home = () =>{
