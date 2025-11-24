@@ -19,6 +19,9 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/file" element={<File />}></Route>
       <Route path="/ahorcado" element={<Ahorcado />} />
+      <Route path="/Sopa" element={<Sopa />} />
+      <Route path="/Crucigrama" element={<Crucigrama />} />
+      <Route path="/parrafo" element={<Parrafo />} />
     </Routes>
   );
 }
