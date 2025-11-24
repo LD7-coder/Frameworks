@@ -11,6 +11,16 @@
     justify-content: center;
     gap: 10px;
 }
+.contenedorCrucigrama {
+    background-color: #D3D3D3; 
+    padding: 10px;
+    border-radius: 15px;
+    max-height: 700px;
+    max-width: 820px;
+    overflow: auto;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2), 0 0 12px rgba(0,0,0,0.1);
+}
+
 .divLetraC{
     display: flex;
     justify-content: center;

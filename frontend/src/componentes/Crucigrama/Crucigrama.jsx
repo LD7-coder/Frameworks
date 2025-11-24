@@ -3,11 +3,10 @@ import './Crucigrama.css';
 import { useEffect, useRef, useState } from "react";
 
 function Crucigrama() {
-
     const finalData = JSON.parse(localStorage.getItem("finalData"));
 
     const palabrasDesdeAI = finalData?.crucigrama?.map(item => item[0].toUpperCase()) ?? [];
-    const pistasDesdeAI    = finalData?.crucigrama?.map((item, i) => `${i + 1}. ${item[1]}`) ?? [];
+    const pistasDesdeAI = finalData?.crucigrama?.map((item, i) => `${i + 1}. ${item[1]}`) ?? [];
 
     let objeto = CrucigramaGame(palabrasDesdeAI, 20),
         crucigrama = objeto.matriz;
@@ -56,39 +55,39 @@ function Crucigrama() {
         console.log(palabrasIngresadas);
     }, [palabrasIngresadas]);
 
-
     return (
         <>
             <div className="divPantallaC">
-                <div className="divCrucigrama" style={{ gridTemplateColumns: `repeat(${crucigrama[0].length}, 1fr)` }}>
-                    {crucigrama.map((arreglo, rowKey) => (
-                        arreglo.map((item, colKey) =>
-                            item !== ""
-                                ? (<div key={`${rowKey}${colKey}`}>
-                                    {item === item.toUpperCase()
-
-                                        ? (<div className="organizarI">
-                                            <div style={{ width: "15px", height: "15px", fontSize: "10px", color: "#0d0d0d", textShadow: "0 0 4px rgba(0, 0, 0, 0.6),0 0 8px rgba(0, 0, 0, 0.4)" }}>{c += 1}</div>
-                                            <input className="divLetraC" maxLength={1} onChange={(e) => {
-                                                setIngresadas(palabrasIngresadas => {
-                                                    palabrasIngresadas[rowKey][colKey] = e.target.value;
-                                                    return [...palabrasIngresadas];
-                                                })
-                                            }}></input>
-                                        </div>)
-                                        : (<div className="organizarI">
-                                            <div style={{ width: "15px", height: "15px" }}><h2></h2></div>
-                                            <input className="divLetraC" maxLength={1} onChange={(e) => {
-                                                setIngresadas(palabrasIngresadas => {
-                                                    palabrasIngresadas[rowKey][colKey] = e.target.value;
-                                                    return [...palabrasIngresadas];
-                                                })
-                                            }}></input>
-                                        </div>)}
-                                </div>)
-                                : (<div key={`${rowKey}${colKey}`}></div>)
-                        )
-                    ))}
+                <div className="contenedorCrucigrama">
+                    <div className="divCrucigrama" style={{ gridTemplateColumns: `repeat(${crucigrama[0].length}, 1fr)` }}>
+                        {crucigrama.map((arreglo, rowKey) => (
+                            arreglo.map((item, colKey) =>
+                                item !== ""
+                                    ? (<div key={`${rowKey}${colKey}`}>
+                                        {item === item.toUpperCase()
+                                            ? (<div className="organizarI">
+                                                <div style={{ width: "15px", height: "15px", fontSize: "10px", color: "#0d0d0d", textShadow: "0 0 4px rgba(0, 0, 0, 0.6),0 0 8px rgba(0, 0, 0, 0.4)" }}>{c += 1}</div>
+                                                <input className="divLetraC" maxLength={1} onChange={(e) => {
+                                                    setIngresadas(palabrasIngresadas => {
+                                                        palabrasIngresadas[rowKey][colKey] = e.target.value;
+                                                        return [...palabrasIngresadas];
+                                                    })
+                                                }}></input>
+                                            </div>)
+                                            : (<div className="organizarI">
+                                                <div style={{ width: "15px", height: "15px" }}><h2></h2></div>
+                                                <input className="divLetraC" maxLength={1} onChange={(e) => {
+                                                    setIngresadas(palabrasIngresadas => {
+                                                        palabrasIngresadas[rowKey][colKey] = e.target.value;
+                                                        return [...palabrasIngresadas];
+                                                    })
+                                                }}></input>
+                                            </div>)}
+                                    </div>)
+                                    : (<div key={`${rowKey}${colKey}`}></div>)
+                            )
+                        ))}
+                    </div>
                 </div>
 
                 <div className="secundarioC">
