@@ -27,7 +27,7 @@ function Registro() {
         }
 
         alert("Registro exitoso");
-        navigate("/home");
+        navigate("/file");
       })
       .catch((err) => {
         console.error(err);

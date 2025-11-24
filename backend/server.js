@@ -107,13 +107,12 @@ app.post("/api/analyze-pdf", upload.single("pdfFile"), async (req, res) => {
     });
 
     let geminiRaw = response.candidates[0].content.parts[0].text;
-    console.log("Respuesta cruda:", geminiRaw.substring(0, 80) + "...");
 
     const cleaned = cleanGeminiResponse(geminiRaw);
 
     const scope = {};
     const fn = new Function("scope", `"use strict"; ${cleaned}; Object.assign(scope,{juego1,juego2,juego3,juego4});`);
-    fn(scope);
+    fn(scope);  
 
     const finalData = {
       ahorcado: scope.juego1,
@@ -122,6 +121,10 @@ app.post("/api/analyze-pdf", upload.single("pdfFile"), async (req, res) => {
       completarFrase: scope.juego4,
     };
 
+    console.log("Juego 1 (ahorcado):", scope.juego1);
+    console.log("Juego 2 (sopa de letras):", scope.juego2);
+    console.log("Juego 3 (crucigrama):", scope.juego3);
+    console.log("Juego 4 (completar frase):", scope.juego4);
     return res.status(200).json(finalData);
 
   } catch (error) {
