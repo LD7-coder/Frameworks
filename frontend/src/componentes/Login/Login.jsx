@@ -23,7 +23,6 @@ function Login() {
           alert("Error en el servidor");
           return;
         }
-        alert("Login exitoso");
         navigate("/file");
       })
       .catch((err) => {
