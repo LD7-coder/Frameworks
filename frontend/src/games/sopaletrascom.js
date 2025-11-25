@@ -32,13 +32,15 @@ function MostrarMatriz(matriz) {
 
 function ColocarPalabras(matriz, palabras) {
   let completo = false;
+
   while (!completo) {
     for (let i = 0; i < palabras.length - 2; i++) {
       let terminado = false;
       while (!terminado) {
-        let d = Math.floor(Math.random() * 8) + 1;
+        let d = Math.floor(Math.random() * 4) + 1; // SOLO 1-4
         let x = Math.floor(Math.random() * matriz.length);
         let y = Math.floor(Math.random() * matriz.length);
+
         if (VerSiCabe(matriz, palabras[i], x, y, d)) {
           Colocar(matriz, palabras[i], x, y, d);
           terminado = true;
@@ -54,7 +56,7 @@ function ColocarPalabras(matriz, palabras) {
     let colocado = false;
 
     for (let c of coincidencias) {
-      for (let d = 1; d <= 8; d++) {
+      for (let d = 1; d <= 4; d++) {
         if (VerSiCabeConCruce(matriz, palabra, c.x, c.y, d, c.indicePalabra)) {
           ColocarConCruce(matriz, palabra, c.x, c.y, d, c.indicePalabra);
           colocado = true;
@@ -64,11 +66,10 @@ function ColocarPalabras(matriz, palabras) {
       if (colocado) break;
     }
 
-    // Si no se pudo cruzar, colocar normal
     if (!colocado) {
       let terminado = false;
       while (!terminado) {
-        let d = Math.floor(Math.random() * 8) + 1;
+        let d = Math.floor(Math.random() * 4) + 1;
         let x = Math.floor(Math.random() * matriz.length);
         let y = Math.floor(Math.random() * matriz.length);
         if (VerSiCabe(matriz, palabra, x, y, d)) {
@@ -82,70 +83,38 @@ function ColocarPalabras(matriz, palabras) {
 
 function VerSiCabe(matriz, palabra, x, y, d) {
   switch (d) {
-    case 1: // HORIZONTAL DERECHA
+    case 1: // HORIZONTAL DERECHA →
       if (y + palabra.length <= matriz.length) {
-        for (let i = 0; i < palabra.length; i++) {
+        for (let i = 0; i < palabra.length; i++)
           if (matriz[x][y + i] !== "") return false;
-        }
         return true;
       }
       return false;
-    case 2: // HORIZONTAL IZQUIERDA
+
+    case 2: // HORIZONTAL IZQUIERDA ←
       if (y - (palabra.length - 1) >= 0) {
-        for (let i = 0; i < palabra.length; i++) {
+        for (let i = 0; i < palabra.length; i++)
           if (matriz[x][y - i] !== "") return false;
-        }
         return true;
       }
       return false;
-    case 3: // VERTICAL ABAJO
+
+    case 3: // VERTICAL ABAJO ↓
       if (x + palabra.length <= matriz.length) {
-        for (let i = 0; i < palabra.length; i++) {
+        for (let i = 0; i < palabra.length; i++)
           if (matriz[x + i][y] !== "") return false;
-        }
         return true;
       }
       return false;
-    case 4: // VERTICAL ARRIBA
+
+    case 4: // VERTICAL ARRIBA ↑
       if (x - (palabra.length - 1) >= 0) {
-        for (let i = 0; i < palabra.length; i++) {
+        for (let i = 0; i < palabra.length; i++)
           if (matriz[x - i][y] !== "") return false;
-        }
         return true;
       }
       return false;
-    case 5: // DIAGONAL ABAJO DERECHA
-      if (x + palabra.length <= matriz.length && y + palabra.length <= matriz.length) {
-        for (let i = 0; i < palabra.length; i++) {
-          if (matriz[x + i][y + i] !== "") return false;
-        }
-        return true;
-      }
-      return false;
-    case 6: // DIAGONAL ABAJO IZQUIERDA
-      if (x + palabra.length <= matriz.length && y - (palabra.length - 1) >= 0) {
-        for (let i = 0; i < palabra.length; i++) {
-          if (matriz[x + i][y - i] !== "") return false;
-        }
-        return true;
-      }
-      return false;
-    case 7: // DIAGONAL ARRIBA DERECHA
-      if (x - (palabra.length - 1) >= 0 && y + palabra.length <= matriz.length) {
-        for (let i = 0; i < palabra.length; i++) {
-          if (matriz[x - i][y + i] !== "") return false;
-        }
-        return true;
-      }
-      return false;
-    case 8: // DIAGONAL ARRIBA IZQUIERDA
-      if (x - (palabra.length - 1) >= 0 && y - (palabra.length - 1) >= 0) {
-        for (let i = 0; i < palabra.length; i++) {
-          if (matriz[x - i][y - i] !== "") return false;
-        }
-        return true;
-      }
-      return false;
+
     default:
       return false;
   }
@@ -157,10 +126,6 @@ function Colocar(matriz, palabra, x, y, d) {
     case 2: for (let i = 0; i < palabra.length; i++) matriz[x][y - i] = palabra[i].toUpperCase(); break;
     case 3: for (let i = 0; i < palabra.length; i++) matriz[x + i][y] = palabra[i].toUpperCase(); break;
     case 4: for (let i = 0; i < palabra.length; i++) matriz[x - i][y] = palabra[i].toUpperCase(); break;
-    case 5: for (let i = 0; i < palabra.length; i++) matriz[x + i][y + i] = palabra[i].toUpperCase(); break;
-    case 6: for (let i = 0; i < palabra.length; i++) matriz[x + i][y - i] = palabra[i].toUpperCase(); break;
-    case 7: for (let i = 0; i < palabra.length; i++) matriz[x - i][y + i] = palabra[i].toUpperCase(); break;
-    case 8: for (let i = 0; i < palabra.length; i++) matriz[x - i][y - i] = palabra[i].toUpperCase(); break;
   }
 }
 
@@ -169,12 +134,12 @@ function BuscarCoincidencias(matriz, palabra) {
   for (let x = 0; x < matriz.length; x++) {
     for (let y = 0; y < matriz.length; y++) {
       let letra = matriz[x][y];
-      if (letra !== "" && palabra.includes(letra)) {
+      if (letra !== "" && palabra.includes(letra.toLowerCase())) {
         coincidencias.push({
           x,
           y,
           letra,
-          indicePalabra: palabra.indexOf(letra)
+          indicePalabra: palabra.toUpperCase().indexOf(letra)
         });
       }
     }
@@ -187,12 +152,12 @@ function VerSiCabeConCruce(matriz, palabra, x, y, d, indicePalabra) {
 
   for (let i = 0; i < palabra.length; i++) {
     let dx = 0, dy = 0;
+
     switch (d) {
-      case 1: dy = i - indicePalabra; break; // DERECHA
-      case 2: dy = indicePalabra - i; break; // IZQUIERDA
-      case 3: dx = i - indicePalabra; break; // ABAJO
-      case 4: dx = indicePalabra - i; break; // ARRIBA
-      default: return false;
+      case 1: dy = i - indicePalabra; break;
+      case 2: dy = indicePalabra - i; break;
+      case 3: dx = i - indicePalabra; break;
+      case 4: dx = indicePalabra - i; break;
     }
 
     const nx = x + dx;
@@ -209,12 +174,14 @@ function VerSiCabeConCruce(matriz, palabra, x, y, d, indicePalabra) {
 function ColocarConCruce(matriz, palabra, x, y, d, indicePalabra) {
   for (let i = 0; i < palabra.length; i++) {
     let dx = 0, dy = 0;
+
     switch (d) {
       case 1: dy = i - indicePalabra; break;
       case 2: dy = indicePalabra - i; break;
       case 3: dx = i - indicePalabra; break;
       case 4: dx = indicePalabra - i; break;
     }
+
     const nx = x + dx;
     const ny = y + dy;
     matriz[nx][ny] = palabra[i].toUpperCase();

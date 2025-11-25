@@ -10,7 +10,7 @@ const File = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const fileInputRef = useRef(null);
-    const navigate = useNavigate();   // ← para redirigir
+    const navigate = useNavigate();  
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -42,22 +42,11 @@ const File = () => {
             if (!response.ok) {
                 throw new Error(data.error || 'Hubo un problema al analizar el PDF.');
             }
-
-            // ------------------------------
-            // 🟢 1. BORRAR LO QUE YA HABÍA
-            // ------------------------------
             localStorage.removeItem("finalData");
 
-            // ------------------------------
-            // 🟢 2. GUARDAR NUEVO FINALDATA
-            // ------------------------------
             localStorage.setItem("finalData", JSON.stringify(data));
 
             console.log("FINALDATA GUARDADO EN LOCALSTORAGE:", data);
-
-            // ------------------------------
-            // 🟢 3. REDIRIGIR A SELECCIÓN DE JUEGOS
-            // ------------------------------
             navigate("/home");
 
         } catch (err) {
