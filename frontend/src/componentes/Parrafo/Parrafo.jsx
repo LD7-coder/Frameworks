@@ -13,7 +13,48 @@ function Parrafo() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [activar, setActivar] = useState(false);
+    const data = location.state;
+
+
+    useEffect(() => {
+        if (!data) navigate("/file");
+    }, []);
+
+    if (!data) return null; 
+
+    const textoOriginal = data[0];
+    const palabrasCorrectas = data.slice(1);
+    const total = palabrasCorrectas.length;
+
+    function generarParrafoConHuecos(texto, palabras) {
+        let mod = texto;
+        palabras.forEach(p => {
+            const regex = new RegExp(`\\b${p}\\b`, "i");
+            mod = mod.replace(regex, "___");
+        });
+        return mod;
+    }  
+
+    const parrafoProcesado = generarParrafoConHuecos(textoOriginal, palabrasCorrectas);
+
+    const [selecciones, setSelecciones] = useState(Array(total).fill(""));
+    const [resultado, setResultado] = useState(null);
+
+    useEffect(() => {
+        if(resultado === total){
+            setEstado("ganaste")
+        }else{
+            setEstado("perdiste")
+        }
+    }, [resultado])
+
+    function shuffleArray(arr) {
+        return arr.sort(() => Math.random() - 0.5);
+    }
+
+    const [palabrasDisponibles, setPalabrasDisponibles] = useState(
+        shuffleArray([...palabrasCorrectas])
+    );
 
     // ----------------- RELOJ -----------------
     const actSeg = useRef(0);
@@ -22,7 +63,9 @@ function Parrafo() {
 
     const [seg, setSeg] = useState(0);
     const [min, setMin] = useState(0);
-    const [estado, setEstado] = useState("jugando")
+
+    const [activar, setActivar] = useState();
+    const [estado, setEstado] = useState();
 
     useEffect(() => {
         intervalo.current = setInterval(() => {
@@ -40,57 +83,6 @@ function Parrafo() {
         return () => clearInterval(intervalo.current);
     }, []);
 
-    const data = location.state;
-
-    // Si alguien entra directo sin PDF
-    useEffect(() => {
-        if (!data) navigate("/file");
-    }, []);
-
-    if (!data) return null;
-
-    // -----------------------------------------
-    // 🟢 data[0] = párrafo completo
-    // 🟢 data[1..n] = palabras correctas
-    // -----------------------------------------
-    const textoOriginal = data[0];
-    const palabrasCorrectas = data.slice(1);
-    const total = palabrasCorrectas.length;
-
-    // Quitar palabras y reemplazar por ___
-    function generarParrafoConHuecos(texto, palabras) {
-        let mod = texto;
-        palabras.forEach(p => {
-            const regex = new RegExp(`\\b${p}\\b`, "i");
-            mod = mod.replace(regex, "___");
-        });
-        return mod;
-    }
-
-    const parrafoProcesado = generarParrafoConHuecos(textoOriginal, palabrasCorrectas);
-
-    const [selecciones, setSelecciones] = useState(Array(total).fill(""));
-    const [resultado, setResultado] = useState(null);
-
-    useEffect(() => {
-        if(resultado === total){
-            setEstado("ganaste")
-        }else{
-            setEstado("perdiste")
-        }
-    }, [resultado])
-
-    // Mezclar palabras
-    function shuffleArray(arr) {
-        return arr.sort(() => Math.random() - 0.5);
-    }
-
-    const [palabrasDisponibles, setPalabrasDisponibles] = useState(
-        shuffleArray([...palabrasCorrectas]))
-
-    // -----------------------------------------
-    // 🟢 Colocar palabra en el siguiente hueco libre
-    // -----------------------------------------
     function seleccionarPalabra(palabra) {
         const index = selecciones.indexOf("");
 
@@ -103,9 +95,6 @@ function Parrafo() {
         setPalabrasDisponibles(prev => prev.filter(p => p !== palabra));
     }
 
-    // -----------------------------------------
-    // 🟢 Quitar palabra colocada
-    // -----------------------------------------
     function quitarPalabra(i) {
         const palabraQuitada = selecciones[i];
         if (!palabraQuitada) return;
@@ -117,9 +106,6 @@ function Parrafo() {
         setPalabrasDisponibles(prev => [...prev, palabraQuitada]);
     }
 
-    // -----------------------------------------
-    // 🟢 Revisar respuestas
-    // -----------------------------------------
     function revisar() {
         let correctas = 0;
         selecciones.forEach((p, i) => {
@@ -129,9 +115,6 @@ function Parrafo() {
         setActivar(true);
     }
 
-    // -----------------------------------------
-    // 🟢 Renderizar texto con huecos
-    // -----------------------------------------
     function renderParrafo() {
         const partes = parrafoProcesado.split("___");
         const final = [];

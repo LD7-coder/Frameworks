@@ -94,3 +94,6 @@ body {
   color: #0d0d0d;
   text-shadow: 0 0 3px rgb(138, 43, 226), 0 0 6px rgb(138, 43, 226);
 }
+.texto .link {
+  margin-left: 6px;
+}

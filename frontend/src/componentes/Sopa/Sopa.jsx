@@ -5,33 +5,31 @@ import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Popup from "../Popup/Popup";
 
-let objeto = SopaLetras(["HOLA", "ADIOS", "PERRO", "GATO", "FER", "DAVID", "LUIS"], 15),
-  sopa = objeto.matriz,
-  palabras = objeto.palabras,
-  colores = ["#FFF9A6", "#FFB3B3", "#D7B7FF", "#AEE6FF", "#BFFFC8", "#FFD8A8", "#FFC0D9", "#B8FFE0"];
+function Sopa() {
+    const location = useLocation();
+    const palabrasAI = location.state;
 
+    const [sopa, setSopa] = useState([]);
+    const [palabras, setPalabras] = useState([]);
 
-function Sopa(){
+    const colores = ["#FFF9A6", "#FFB3B3", "#D7B7FF", "#AEE6FF", "#BFFFC8", "#FFD8A8", "#FFC0D9", "#B8FFE0"];
+
     const actSeg = useRef(0);
     const actMin = useRef(0);
     const intervalo = useRef(null);
-    const divRef = useRef([]);
-    const divL = useRef([]);
-    const setLink = useNavigate();
+    const [min, setMin] = useState(0);
+    const [seg, setSeg] = useState(0);
+
+    const divRef = useRef([]); 
+    const divL = useRef([]);   
+
+    const navigate = useNavigate();
 
     const [bandera, setBandera] = useState(false);
     const [finalizar, setFinalizar] = useState(true);
     const [letras_seleccionadas, setLetrasSeleccionadas] = useState([]);
     const [modo, setModo] = useState("");
-    const [min, setMin] = useState(0);
-    const [seg, setSeg] = useState(0);
-    const [correctas, setCorrectas] = useState(0);
-    const [estado, setEstado] = useState("jugando")
-
-    const regresarComponente = () => {
-        clearInterval(intervalo.current);
-        return <Popup min={min} seg={seg} intentos={null} resultado={null} estado={estado.toUpperCase()}></Popup>
-    };
+    //const [correctas, setCorrectas] = useState(palabras);
 
     //Intervalo creado cuando se monta el componente
     useEffect(()=>{
@@ -61,25 +59,21 @@ function Sopa(){
             }
         }, [correctas])
 
-
     const setDivRef = (div, rowIndex, colIndex) => {
-        if(!divRef.current[rowIndex]){
-            divRef.current[rowIndex] = [];
-        }
+        if (!divRef.current[rowIndex]) divRef.current[rowIndex] = [];
         divRef.current[rowIndex][colIndex] = div;
-    }
+    };
 
     const setDivL = (div, rowIndex) => {
         divL.current[rowIndex] = div;
-    }
+    };
 
     const getDivRef = (rowIndex, colIndex) => {
-        //Doble prptección en caso que las referencias no se hayan completado aún, evitamos acceder a un undefined
-        return divRef.current[rowIndex]?.[colIndex] ?? null
-    }
+        return divRef.current?.[rowIndex]?.[colIndex] ?? null;
+    };
 
     const getDivL = (rowIndex) => {
-        return divL.current[rowIndex] ?? null;
+        return divL.current[rowIndex] ?? null
     }
 
     const handleMouseDown = (e, rowIndex, colIndex) =>{
@@ -93,110 +87,42 @@ function Sopa(){
     }
 
     const handleMouseMove = (e, rowIndex, colIndex) => {
+        if (!bandera) return;
         const div = getDivRef(rowIndex, colIndex);
-        //Validamos si la bandera viene a true significa que el MouseDown se inicio
-        if(bandera && (div && div.contains(e.target))){
-            //div.style.backgroundColor = '#D3D3D3';
-            //Evitar guardar repetidos dentrode las palabras seleccionadas 
-            setLetrasSeleccionadas((letras_seleccionadas) => {
-                //Evitar letras repetidas, debe estar dentro de useState para evitar que la logica lea 
-                //el estado desactualizado de letras_seleccionadas 
-                if(letras_seleccionadas.length !== 0){
-                    if(!(letras_seleccionadas.some((obj) => (
-                        (obj.rowIndex === rowIndex && obj.colIndex === colIndex)
-                    )))){
-                        //console.log(letras_seleccionadas[letras_seleccionadas.length - 1])
-                        return [...letras_seleccionadas, {rowIndex: rowIndex, colIndex: colIndex, letra: getDivRef(rowIndex, colIndex).textContent}];
-                    }else{
-                        return letras_seleccionadas;
-                    }
-                }else{
-                    return [...letras_seleccionadas, {rowIndex: rowIndex, colIndex: colIndex, letra: getDivRef(rowIndex, colIndex).textContent}];
-                }
-            });
-        }else{
-            console.log('No existe');
-        }
-    }
+        if (!div) return;
+        setLetrasSeleccionadas((prev) => {
+            if (prev.some(obj => obj.rowIndex === rowIndex && obj.colIndex === colIndex)) return prev;
+            return [...prev, { rowIndex, colIndex, letra: div.textContent }];
+        });
+    };
 
     const handleMouseUp = (e, rowIndex, colIndex) => {
+        if (!bandera) return;
         const div = getDivRef(rowIndex, colIndex);
-        if(div && div.contains(e.target)){
-            setBandera(false);
-            setFinalizar(false);
-        }else{
-            console.log('No existe');
-        }
-    }
+        setBandera(false);
+        setFinalizar(false);
+    };
 
-    /*
-    **Modos**
-    -RR: REVERSO
-    -R: ROW NORMAL
-    -CR: REVERSO
-    -C: COLUMN NORMAL
-    */
     useEffect(() => {
-        if(letras_seleccionadas.length === 1){
-            //Coloreamos
-            getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-            //console.log(letras_seleccionadas[letras_seleccionadas.length - 1])
-        }else if(letras_seleccionadas.length === 2){
-            //console.log(letras_seleccionadas[letras_seleccionadas.length - 1])
-            //console.log(letras_seleccionadas[letras_seleccionadas.length - 2])
-            if(letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex === letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex){
-                if(letras_seleccionadas[letras_seleccionadas.length - 1].colIndex < letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
-                    setModo('RR')
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }else if(letras_seleccionadas[letras_seleccionadas.length - 1].colIndex > letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
-                    setModo('R')
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }
-            }else if(letras_seleccionadas[letras_seleccionadas.length - 2].colIndex === letras_seleccionadas[letras_seleccionadas.length - 1].colIndex){
-                if(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex < letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
-                    setModo('CR')
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }else if(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex > letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
-                    setModo('C')
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }
-            }
-            /*
-            if((letras_seleccionadas[letras_seleccionadas.length - 2]?.rowIndex + 1) === letras_seleccionadas[letras_seleccionadas - 1].rowIndex){
-                console.log("YEI")
-            }
-                */
+        if (letras_seleccionadas.length === 0) return;
+
+        const last = letras_seleccionadas[letras_seleccionadas.length - 1];
+        const lastDiv = getDivRef(last.rowIndex, last.colIndex);
+        if (lastDiv) lastDiv.style.backgroundColor = '#D3D3D3';
+
+        if (letras_seleccionadas.length >= 2) {
+            const a = letras_seleccionadas[letras_seleccionadas.length - 2];
+            const b = letras_seleccionadas[letras_seleccionadas.length - 1];
+
+        if (a.rowIndex === b.rowIndex) {
+            if (b.colIndex < a.colIndex) setModo('RR');
+            else if (b.colIndex > a.colIndex) setModo('R');
+        } else if (a.colIndex === b.colIndex) {
+            if (b.rowIndex < a.rowIndex) setModo('CR');
+            else if (b.rowIndex > a.rowIndex) setModo('C');
         }
-        if(modo === 'RR'){
-            if(letras_seleccionadas[0].rowIndex === letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex){
-                console.log("Modo row-reverse")
-                //console.log(letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex)
-                if((letras_seleccionadas[letras_seleccionadas.length - 1].colIndex + 1) === letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }
-            }
-        }else if(modo === 'R'){
-            if(letras_seleccionadas[0].rowIndex === letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex){
-                console.log("Modo row")
-                //console.log(letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex)
-                if((letras_seleccionadas[letras_seleccionadas.length - 1].colIndex - 1) === letras_seleccionadas[letras_seleccionadas.length - 2].colIndex){
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }
-            }
-        }else if(modo === 'CR'){
-            if(letras_seleccionadas[0].colIndex === letras_seleccionadas[letras_seleccionadas.length - 1].colIndex){
-                if((letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex + 1) === letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }
-            }    
-        }else if(modo === 'C'){
-            if(letras_seleccionadas[0].colIndex === letras_seleccionadas[letras_seleccionadas.length - 1].colIndex){
-                if((letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex - 1) === letras_seleccionadas[letras_seleccionadas.length - 2].rowIndex){
-                    getDivRef(letras_seleccionadas[letras_seleccionadas.length - 1].rowIndex, letras_seleccionadas[letras_seleccionadas.length - 1].colIndex).style.backgroundColor = '#D3D3D3';
-                }
-            } 
         }
-    }, [letras_seleccionadas, modo])
+    }, [letras_seleccionadas]);
 
     useEffect(() => {
         if(finalizar === false){
@@ -210,7 +136,6 @@ function Sopa(){
             console.log(indexC)
             if(indexC > -1){
                 console.log("confirmación")
-                setCorrectas(correctas => {correctas +=1; console.log(correctas); return correctas});
                 letras_seleccionadas.forEach((l) => {
                     console.log(colores[indexC])
                     getDivRef(l.rowIndex, l.colIndex).style.backgroundColor = `${colores[indexC]}`;
@@ -234,9 +159,9 @@ function Sopa(){
         <>
             <div className="divPantalla">
                 <div className="divMetadatosS">
-                    <div style={{width: "405px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Sopa de Letras</h1></div>
+                    <div style={{width: "405px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
                     <div style={{width: "500", display: "flex", justifyContent: "center", alignItems: "center", gap: "20px"}}>
-                        <h2 className="MdatoS" style={{ color: "0 0 3px #fff"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
+                        <h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
                         <button className="Bsalir" style={{color: "#0D0D0D"}} onClick={() => {setLink("/home")}}>Salir</button>
                     </div>
                 </div>
@@ -249,7 +174,7 @@ function Sopa(){
                         ))}
                     </div>
                     <div className="liPalabra">
-                        <div style={{color: "#0d0d0d", fontSize: "30px", textShadow: "0 0 6px rgb(138, 43, 226), 0 0 12px rgb(138, 43, 226)"}}>¡PALABRAS!</div>
+                        <div style={{color: "#0d0d0d", fontSize: "30px", textShadow: "0 0 6px rgb(138, 43, 226), 0 0 12px rgb(138, 43, 226)"}}>¡PALABRAS!</div
                         {palabras.map((item, key) => (
                             (<div key={key} ref={(div) => setDivL(div, key)}  className="palabraS"><h3>{item.toUpperCase()}</h3></div>)
                         ))}
