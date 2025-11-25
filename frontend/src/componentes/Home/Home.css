@@ -12,8 +12,8 @@ body {
     align-items: center;
     justify-content: center;
     place-items: center;
-    width: 1500px;
-    height: 100%;
+    width: 99vw;
+    height: 99vh;
     border: 3px solid rgb(0, 255, 255);
     box-shadow: 0 0 6px rgb(0, 255, 255), 0 0 12px rgb(0, 255, 255);
 }

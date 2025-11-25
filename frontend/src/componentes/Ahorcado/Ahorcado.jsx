@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState, useRef} from "react";
 import { useLocation } from "react-router-dom";
 import { AhorcadoGame } from "../../games/ahorcado";
+import Popup from "../Popup/Popup";
 import "./Ahorcado.css";
 
 import img1 from "../../Imagenes/Ahorcado1.jpg";
@@ -21,6 +22,38 @@ function Ahorcado() {
     const [oculta, setOculta] = useState(juego.obtenerPalabraOculta());
     const [estado, setEstado] = useState("jugando");
     const [usadas, setUsadas] = useState({});
+    const [min, setMin] = useState(0);
+    const [seg, setSeg] = useState(0);
+
+    const actSeg = useRef(0);
+    const actMin = useRef(0);
+    const intervalo = useRef(null);
+
+    const regresarComponente = () => {
+        clearInterval(intervalo.current);
+        return <Popup min={min} seg={seg} intentos={errores} resultado={null} estado={estado.toUpperCase()}></Popup>
+    };
+
+    useEffect(()=>{
+        console.log("Hola, estoy existiendo")
+        intervalo.current = setInterval(() => {
+            if(actSeg.current === 60){
+                actSeg.current = 0
+                setSeg(actSeg.current); 
+                actMin.current += 1
+                setMin(actMin.current); 
+            }else{
+                actSeg.current += 1
+                setSeg(actSeg.current); 
+            }
+        }, 1100);
+
+        //Función que detiene la ejecución en cuanto se desmonta el componente
+        return () => {
+            clearInterval(intervalo.current)
+        };
+
+    }, []);
 
     const manejarClick = (letra) => {
         if (estado !== "jugando") return;
@@ -55,7 +88,7 @@ function Ahorcado() {
                     </div>
 
                     <div className='MdatoA' style={{ width: "60px" }}>
-                        <h2 style={{ textShadow: "0 0 3px #fff" }}>09:25</h2>
+                        <h2 style={{ color: "0 0 3px #fff"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
                     </div>
                 </div>
 
@@ -99,11 +132,14 @@ function Ahorcado() {
                     ))}
                 </div>
 
-                <h2 style={{ color: "white" }}>
-                    {estado === "jugando" ? "Adivina la palabra" : estado.toUpperCase()}
-                </h2>
+                <div className="contenedorIndicadores">
+                    <h2 style={{ color: "white" }} className="indicadores">
+                        {estado === "jugando" ? "Adivina la palabra" : estado.toUpperCase()}
+                    </h2>
 
-                <h3 style={{ color: "white" }}>Intentos restantes: {juego.intentos}</h3>
+                    <h3 style={{ color: "white" }} className="indicadores">Intentos restantes: {juego.intentos}</h3>
+                </div>
+                {(estado === 'ganaste' || estado === 'perdiste') && regresarComponente()}
             </div>
         </>
     );

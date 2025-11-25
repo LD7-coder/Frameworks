@@ -3,6 +3,7 @@ import './Sopa.css';
 import { useEffect, useState } from "react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Popup from "../Popup/Popup";
 
 let objeto = SopaLetras(["HOLA", "ADIOS", "PERRO", "GATO", "FER", "DAVID", "LUIS"], 15),
   sopa = objeto.matriz,
@@ -24,7 +25,13 @@ function Sopa(){
     const [modo, setModo] = useState("");
     const [min, setMin] = useState(0);
     const [seg, setSeg] = useState(0);
-    //const [correctas, setCorrectas] = useState(palabras);
+    const [correctas, setCorrectas] = useState(0);
+    const [estado, setEstado] = useState("jugando")
+
+    const regresarComponente = () => {
+        clearInterval(intervalo.current);
+        return <Popup min={min} seg={seg} intentos={null} resultado={null} estado={estado.toUpperCase()}></Popup>
+    };
 
     //Intervalo creado cuando se monta el componente
     useEffect(()=>{
@@ -48,6 +55,13 @@ function Sopa(){
 
     }, []);
 
+    useEffect(() => {
+            if(correctas === palabras.length){
+                setEstado("ganaste");
+            }
+        }, [correctas])
+
+
     const setDivRef = (div, rowIndex, colIndex) => {
         if(!divRef.current[rowIndex]){
             divRef.current[rowIndex] = [];
@@ -65,7 +79,7 @@ function Sopa(){
     }
 
     const getDivL = (rowIndex) => {
-        return divL.current[rowIndex] ?? null
+        return divL.current[rowIndex] ?? null;
     }
 
     const handleMouseDown = (e, rowIndex, colIndex) =>{
@@ -196,6 +210,7 @@ function Sopa(){
             console.log(indexC)
             if(indexC > -1){
                 console.log("confirmación")
+                setCorrectas(correctas => {correctas +=1; console.log(correctas); return correctas});
                 letras_seleccionadas.forEach((l) => {
                     console.log(colores[indexC])
                     getDivRef(l.rowIndex, l.colIndex).style.backgroundColor = `${colores[indexC]}`;
@@ -219,9 +234,9 @@ function Sopa(){
         <>
             <div className="divPantalla">
                 <div className="divMetadatosS">
-                    <div style={{width: "405px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
+                    <div style={{width: "405px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Sopa de Letras</h1></div>
                     <div style={{width: "500", display: "flex", justifyContent: "center", alignItems: "center", gap: "20px"}}>
-                        <h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
+                        <h2 className="MdatoS" style={{ color: "0 0 3px #fff"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
                         <button className="Bsalir" style={{color: "#0D0D0D"}} onClick={() => {setLink("/home")}}>Salir</button>
                     </div>
                 </div>
@@ -234,11 +249,13 @@ function Sopa(){
                         ))}
                     </div>
                     <div className="liPalabra">
+                        <div style={{color: "#0d0d0d", fontSize: "30px", textShadow: "0 0 6px rgb(138, 43, 226), 0 0 12px rgb(138, 43, 226)"}}>¡PALABRAS!</div>
                         {palabras.map((item, key) => (
-                            (<div key={key} ref={(div) => setDivL(div, key)}  className="palabraS"><h3>{item}</h3></div>)
+                            (<div key={key} ref={(div) => setDivL(div, key)}  className="palabraS"><h3>{item.toUpperCase()}</h3></div>)
                         ))}
                     </div>
                 </div>
+                {(estado === 'ganaste') && regresarComponente()}
             </div>
         </>
     );

@@ -1,10 +1,44 @@
 import './Parrafo.css';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
+import Popup from '../Popup/Popup';
 
 function Parrafo() {
+
+    const regresarComponente = () => {
+        clearInterval(intervalo.current);
+        return <Popup min={min} seg={seg} intentos={null} resultado={resultado} estado={estado.toUpperCase()}></Popup>
+    };
+
     const location = useLocation();
     const navigate = useNavigate();
+
+    const [activar, setActivar] = useState(false);
+
+    // ----------------- RELOJ -----------------
+    const actSeg = useRef(0);
+    const actMin = useRef(0);
+    const intervalo = useRef(null);
+
+    const [seg, setSeg] = useState(0);
+    const [min, setMin] = useState(0);
+    const [estado, setEstado] = useState("jugando")
+
+    useEffect(() => {
+        intervalo.current = setInterval(() => {
+            if (actSeg.current === 60) {
+                actSeg.current = 0;
+                setSeg(actSeg.current);
+                actMin.current += 1;
+                setMin(actMin.current);
+            } else {
+                actSeg.current += 1;
+                setSeg(actSeg.current);
+            }
+        }, 1100);
+
+        return () => clearInterval(intervalo.current);
+    }, []);
 
     const data = location.state;
 
@@ -38,38 +72,21 @@ function Parrafo() {
     const [selecciones, setSelecciones] = useState(Array(total).fill(""));
     const [resultado, setResultado] = useState(null);
 
+    useEffect(() => {
+        if(resultado === total){
+            setEstado("ganaste")
+        }else{
+            setEstado("perdiste")
+        }
+    }, [resultado])
+
     // Mezclar palabras
     function shuffleArray(arr) {
         return arr.sort(() => Math.random() - 0.5);
     }
 
     const [palabrasDisponibles, setPalabrasDisponibles] = useState(
-        shuffleArray([...palabrasCorrectas])
-    );
-
-    // ----------------- RELOJ -----------------
-    const actSeg = useRef(0);
-    const actMin = useRef(0);
-    const intervalo = useRef(null);
-
-    const [seg, setSeg] = useState(0);
-    const [min, setMin] = useState(0);
-
-    useEffect(() => {
-        intervalo.current = setInterval(() => {
-            if (actSeg.current === 60) {
-                actSeg.current = 0;
-                setSeg(actSeg.current);
-                actMin.current += 1;
-                setMin(actMin.current);
-            } else {
-                actSeg.current += 1;
-                setSeg(actSeg.current);
-            }
-        }, 1100);
-
-        return () => clearInterval(intervalo.current);
-    }, []);
+        shuffleArray([...palabrasCorrectas]))
 
     // -----------------------------------------
     // 🟢 Colocar palabra en el siguiente hueco libre
@@ -109,6 +126,7 @@ function Parrafo() {
             if (p === palabrasCorrectas[i]) correctas++;
         });
         setResultado(correctas);
+        setActivar(true);
     }
 
     // -----------------------------------------
@@ -135,7 +153,7 @@ function Parrafo() {
         }
         return final;
     }
-
+ 
     return (
         <div className='divPantallaP'>
             <div className='divMetadatos'>
@@ -146,10 +164,10 @@ function Parrafo() {
                 </div>
 
                 <div className='Mdato'>
-                    <h2 style={{ color: "#FFFF33" }}>Historia</h2>
+                    <h2 style={{ color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Adivina la palabra</h2>
                 </div>
 
-                <div className='Mdato'>
+                <div className='Mdato' style={{ color: "0 0 3px #fff"}}>
                     <h2>{min >= 10 ? min : `0${min}`}:{seg >= 10 ? seg : `0${seg}`}</h2>
                 </div>
             </div>
@@ -177,6 +195,7 @@ function Parrafo() {
                     )}
                 </div>
             </div>
+            {(activar) && regresarComponente()}
         </div>
     );
 }
