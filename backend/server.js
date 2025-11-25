@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyB4cHRgWOzNh0zSk_Th-VYq2rvfvV_b3GI" }); 
+const ai = new GoogleGenAI({ apiKey: "" }); 
 
 const SECRET = "puedesercualquiercontraseña";
 

@@ -4,7 +4,23 @@ import { useEffect, useState } from "react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-let objeto = SopaLetras(["HOLA", "ADIOS", "PERRO", "GATO", "FER", "DAVID", "LUIS"], 15),
+const finalData = JSON.parse(localStorage.getItem("finalData"));
+console.log("a")
+console.log(finalData.sopaDeLetras)
+console.log("a")
+const words = [
+  finalData.sopaDeLetras[0].toUpperCase(),
+  finalData.sopaDeLetras[1].toUpperCase(),
+  finalData.sopaDeLetras[2].toUpperCase(),
+  finalData.sopaDeLetras[3].toUpperCase(),
+  finalData.sopaDeLetras[4].toUpperCase(),
+  finalData.sopaDeLetras[5].toUpperCase(),
+  finalData.sopaDeLetras[6].toUpperCase(),
+  finalData.sopaDeLetras[7].toUpperCase()
+];
+
+//La sopa deberia estar dentro de un useState para que se vaya actualizando
+let objeto = SopaLetras(words, 15),
   sopa = objeto.matriz,
   palabras = objeto.palabras,
   colores = ["#FFF9A6", "#FFB3B3", "#D7B7FF", "#AEE6FF", "#BFFFC8", "#FFD8A8", "#FFC0D9", "#B8FFE0"];
@@ -28,8 +44,7 @@ function Sopa(){
 
     //Intervalo creado cuando se monta el componente
     useEffect(()=>{
-        console.log("Hola, estoy existiendo")
-        intervalo.current = setInterval(() => {
+            intervalo.current = setInterval(() => {
             if(actSeg.current === 60){
                 actSeg.current = 0
                 setSeg(actSeg.current); 
