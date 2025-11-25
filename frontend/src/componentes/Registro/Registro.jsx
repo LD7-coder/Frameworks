@@ -26,7 +26,7 @@ function Registro() {
           return;
         }
 
-        navigate("/file");
+        navigate("/");
       })
       .catch((err) => {
         console.error(err);

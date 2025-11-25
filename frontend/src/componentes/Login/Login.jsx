@@ -8,28 +8,33 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLink = () => {
-    handleLogin(usuario, password)
-      .then((resultado) => {
-        if (resultado.message === "Usuario no encontrado") {
-          alert("Usuario no encontrado");
-          return;
-        }
-        if (resultado.message === "Contraseña incorrecta") {
-          alert("Contraseña incorrecta");
-          return;
-        }
-        if (resultado.status === 500) {
-          alert("Error en el servidor");
-          return;
-        }
-        navigate("/file");
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Error al conectar con el servidor");
-      });
-  };
+ const handleLink = () => {
+  handleLogin(usuario, password)
+    .then((resultado) => {
+      if (resultado.message === "Usuario no encontrado") {
+        alert("Usuario no encontrado");
+        return;
+      }
+      if (resultado.message === "Contraseña incorrecta") {
+        alert("Contraseña incorrecta");
+        return;
+      }
+      if (resultado.status === 500) {
+        alert("Error en el servidor");
+        return;
+      }
+      if (resultado.token) {
+        localStorage.setItem("token", resultado.token);
+      }
+
+      navigate("/file");
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Error al conectar con el servidor");
+    });
+};
+
 
 
   return (

@@ -31,12 +31,16 @@ const File = () => {
         const formData = new FormData();
         formData.append('pdfFile', selectedFile);
 
+        const token = localStorage.getItem("token");
+
         try {
             const response = await fetch('http://localhost:3000/api/analyze-pdf', {
                 method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
                 body: formData,
             });
-
             const data = await response.json();
 
             if (!response.ok) {

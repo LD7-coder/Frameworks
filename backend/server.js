@@ -15,25 +15,26 @@ const SECRET = "puedesercualquiercontraseña";
 
 // Middleware para verificar JWT
 function verifyToken(req, res, next) {
-  const token = req.headers["authorization"];
-
-  if (!token)
+  const authHeader = req.headers["authorization"];
+  if (!authHeader)
     return res.status(401).json({ message: "Token requerido" });
-
+  const parts = authHeader.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Bearer")
+    return res.status(403).json({ message: "Formato de token inválido" });
+  const token = parts[1]; 
   jwt.verify(token, SECRET, (err, decoded) => {
     if (err)
       return res.status(403).json({ message: "Token inválido" });
-
     req.user = decoded;
     next();
   });
 }
 
+
 // Registro
 app.post("/api/register", async (req, res) => {
   try {
     const { usuario, correo, password } = req.body;
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
