@@ -1,15 +1,23 @@
 import SopaLetras from "../../games/sopaletrascom";
 import './Sopa.css';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback}from "react";
 import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation} from "react-router-dom";
 import Popup from "../Popup/Popup";
 
 function Sopa() {
+
+    const regresarComponente = () => {
+        clearInterval(intervalo.current);
+        return <Popup min={min} seg={seg} intentos={null} resultado={null} estado={estado.toUpperCase()}></Popup>
+    };
+    
     const location = useLocation();
+
     const palabrasAI = location.state;
 
     const [sopa, setSopa] = useState([]);
+
     const [palabras, setPalabras] = useState([]);
 
     const colores = ["#FFF9A6", "#FFB3B3", "#D7B7FF", "#AEE6FF", "#BFFFC8", "#FFD8A8", "#FFC0D9", "#B8FFE0"];
@@ -23,13 +31,27 @@ function Sopa() {
     const divRef = useRef([]); 
     const divL = useRef([]);   
 
-    const navigate = useNavigate();
+    const setLink = useNavigate();
 
     const [bandera, setBandera] = useState(false);
     const [finalizar, setFinalizar] = useState(true);
     const [letras_seleccionadas, setLetrasSeleccionadas] = useState([]);
     const [modo, setModo] = useState("");
-    //const [correctas, setCorrectas] = useState(palabras);
+    const [correctas, setCorrectas] = useState(0);
+    const [estado, setEstado] = useState("jugando");
+
+    useEffect(() => {
+        if (!palabrasAI) return;
+        try {
+            const objeto = SopaLetras(palabrasAI, 15);
+            setSopa(objeto.matriz || []);
+            setPalabras(objeto.palabras || []);
+        } catch (err) {
+            console.error("Error generando sopa:", err);
+            setSopa([]);
+            setPalabras([]);
+        }
+    }, [palabrasAI]);
 
     //Intervalo creado cuando se monta el componente
     useEffect(()=>{
@@ -57,7 +79,7 @@ function Sopa() {
             if(correctas === palabras.length){
                 setEstado("ganaste");
             }
-        }, [correctas])
+        }, [correctas, palabras])
 
     const setDivRef = (div, rowIndex, colIndex) => {
         if (!divRef.current[rowIndex]) divRef.current[rowIndex] = [];
@@ -76,15 +98,18 @@ function Sopa() {
         return divL.current[rowIndex] ?? null
     }
 
-    const handleMouseDown = (e, rowIndex, colIndex) =>{
+    const normalizarCadena = useCallback((s) => {
+        if (typeof s !== "string") return "";
+        return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    }, []);
+
+    const handleMouseDown = (e, rowIndex, colIndex) => {
         const div = getDivRef(rowIndex, colIndex);
-        if(bandera == false && (div && div.contains(e.target))){
+        if (!bandera && div && (div === e.target || div.contains(e.target))) {
             setBandera(true);
-            //div.style.backgroundColor = 'pink';
-        }else{
-            console.log('No existe');
+            setLetrasSeleccionadas([{ rowIndex, colIndex, letra: div.textContent }]);
         }
-    }
+    };
 
     const handleMouseMove = (e, rowIndex, colIndex) => {
         if (!bandera) return;
@@ -105,7 +130,6 @@ function Sopa() {
 
     useEffect(() => {
         if (letras_seleccionadas.length === 0) return;
-
         const last = letras_seleccionadas[letras_seleccionadas.length - 1];
         const lastDiv = getDivRef(last.rowIndex, last.colIndex);
         if (lastDiv) lastDiv.style.backgroundColor = '#D3D3D3';
@@ -136,6 +160,7 @@ function Sopa() {
             console.log(indexC)
             if(indexC > -1){
                 console.log("confirmación")
+                setCorrectas(correctas => (correctas += 1))
                 letras_seleccionadas.forEach((l) => {
                     console.log(colores[indexC])
                     getDivRef(l.rowIndex, l.colIndex).style.backgroundColor = `${colores[indexC]}`;
@@ -155,35 +180,116 @@ function Sopa() {
         }
     }, [finalizar, letras_seleccionadas, modo])
 
-    return(
-        <>
-            <div className="divPantalla">
-                <div className="divMetadatosS">
-                    <div style={{width: "405px"}}><h1 className="MdatoS" style={{color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>Matematicas</h1></div>
-                    <div style={{width: "500", display: "flex", justifyContent: "center", alignItems: "center", gap: "20px"}}>
-                        <h2 className="MdatoS" style={{textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)"}}>{min >= 10 ? min :  `0${min}`}:{seg >= 10 ? seg :  `0${seg}`}</h2>
-                        <button className="Bsalir" style={{color: "#0D0D0D"}} onClick={() => {setLink("/home")}}>Salir</button>
-                    </div>
+    useEffect(() => {
+        return () => {
+            if (divRef.current && divRef.current.length) {
+                for (let i = 0; i < divRef.current.length; i++) {
+                    const row = divRef.current[i];
+                    if (!row) continue;
+                    for (let j = 0; j < row.length; j++) {
+                        const cell = row[j];
+                        if (cell) {
+                            cell.style.backgroundColor = "";
+                        }
+                    }
+                }
+            }
+            if (divL.current && divL.current.length) {
+                for (let k = 0; k < divL.current.length; k++) {
+                    const d = divL.current[k];
+                    if (d) {
+                        d.style.backgroundColor = "";
+                        d.style.borderColor = "";
+                    }   
+                }
+            }
+            clearInterval(intervalo.current);
+        };
+    }, []);
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Escape") {
+            setBandera(false);
+            setLetrasSeleccionadas([]);
+            setModo("");
+        }
+    };
+
+    return (
+    <>
+      <div className="divPantalla" onKeyDown={handleKeyDown} tabIndex={0}>
+        <div className="divMetadatosS">
+          <div style={{ width: "405px" }}>
+            <h1 className="MdatoS" style={{ color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)" }}>
+              Matematicas
+            </h1>
+          </div>
+          <div style={{ width: "500px", display: "flex", justifyContent: "center", alignItems: "center", gap: "20px" }}>
+            <h2 className="MdatoS" style={{ textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)" }}>
+              {min >= 10 ? min : `0${min}`}:{seg >= 10 ? seg : `0${seg}`}
+            </h2>
+            <button className="Bsalir" style={{ color: "#0D0D0D" }} onClick={() => { setLink("/home"); }}>Salir</button>
+          </div>
+        </div>
+
+        <div className="divSecundario">
+          <div
+            className="divSopa"
+            style={{
+              gridTemplateColumns: `repeat(${sopa[0]?.length ?? 0}, 1fr)`
+            }}
+          >
+            {sopa.map((arreglo, rowKey) => (
+              arreglo.map((item, colKey) => (
+                <div
+                  key={`${rowKey}-${colKey}`}
+                  ref={(div) => setDivRef(div, rowKey, colKey)}
+                  className="divLetraS"
+                >
+                  <div
+                    style={{
+                      width: '50%',
+                      height: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#0D0D0D',
+                      userSelect: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onMouseDown={(e) => handleMouseDown(e, rowKey, colKey)}
+                    onMouseMove={(e) => handleMouseMove(e, rowKey, colKey)}
+                    onMouseUp={(e) => handleMouseUp(e, rowKey, colKey)}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      handleMouseDown(e, rowKey, colKey);
+                    }}
+                    onTouchMove={(e) => {
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      handleMouseUp(e, rowKey, colKey);
+                    }}
+                  >
+                    {item}
+                  </div>
                 </div>
-                <div className="divSecundario">
-                    <div  className="divSopa" style={{gridTemplateColumns: `repeat(${sopa[0].length}, 1fr)`}}>
-                        {sopa.map((arreglo, rowKey) => (
-                            arreglo.map((item, colKey) => (
-                                <div key={`${rowKey}${colKey}`}  ref={(div) => setDivRef(div, rowKey, colKey)} className="divLetraS"><div style={{width: '50%', height: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0D0D0D'}} onMouseDown={(e) => {handleMouseDown(e, rowKey, colKey)}} onMouseMove={(e) => {handleMouseMove(e, rowKey, colKey)}} onMouseUp={(e) => {handleMouseUp(e, rowKey, colKey)}}>{item}</div></div>
-                            ))
-                        ))}
-                    </div>
-                    <div className="liPalabra">
-                        <div style={{color: "#0d0d0d", fontSize: "30px", textShadow: "0 0 6px rgb(138, 43, 226), 0 0 12px rgb(138, 43, 226)"}}>¡PALABRAS!</div
-                        {palabras.map((item, key) => (
-                            (<div key={key} ref={(div) => setDivL(div, key)}  className="palabraS"><h3>{item.toUpperCase()}</h3></div>)
-                        ))}
-                    </div>
-                </div>
-                {(estado === 'ganaste') && regresarComponente()}
-            </div>
-        </>
-    );
+              ))
+            ))}
+          </div>
+
+          <div className="liPalabra">
+            {palabras.map((item, key) => (
+              <div key={key} ref={(div) => setDivL(div, key)} className="palabraS">
+                <h3>{item}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+        {(estado === 'ganaste') && regresarComponente()}
+      </div>
+    </>
+  );
 }
 
 export default Sopa;
