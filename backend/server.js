@@ -79,7 +79,7 @@ app.post("/api/analyze-pdf", upload.single("pdfFile"), async (req, res) => {
 
       juego1: arreglo con [palabraClave, pista] - NO INCLUYAS ACENTOS
       juego2: arreglo de 8 palabras clave - NO INCLUYAS NUMEROS
-      juego3: matriz 8x2 con [[palabra, pista], ...] - NO INCLUYAS NUMEROS
+      juego3: matriz 8x2 con [[palabra, pista], ...] - NO INCLUYAS NUMEROS, PALABRAS DE MAXIMO 9
       juego4: arreglo donde el primer valor es un párrafo completo y los siguientes 5 valores
       son 5 palabras clave dentro del párrafo 
 
