@@ -10,7 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyClojc-bepYaI6fY5jmTXXJH55uuZdeZvY" });
+const ai = new GoogleGenAI({ apiKey: "" }); 
+
 const SECRET = "puedesercualquiercontraseña";
 
 // Registro

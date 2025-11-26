@@ -8,7 +8,6 @@ import Crucigrama from "../src/componentes/Crucigrama/Crucigrama";
 import Ahorcado from "../src/componentes/Ahorcado/Ahorcado";
 import Parrafo from "../src/componentes/Parrafo/Parrafo";
 import ProtectedRoute from "./ProtectedRoute";
-
 function App() {
   return (
     <Routes>
