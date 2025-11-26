@@ -203,7 +203,7 @@ function Sopa() {
         <div className="divMetadatosS">
           <div style={{ width: "405px" }}>
             <h1 className="MdatoS" style={{ color: "#FFFF33", textShadow: "0 0 3px rgb(216, 191, 255), 0 0 6px rgb(216, 191, 255)" }}>
-              Matematicas
+              Sopa De Letras
             </h1>
           </div>
           <div style={{ width: "500px", display: "flex", justifyContent: "center", alignItems: "center", gap: "20px" }}>

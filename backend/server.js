@@ -10,26 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const ai = new GoogleGenAI({ apiKey: "" });
+const ai = new GoogleGenAI({ apiKey: "AIzaSyClojc-bepYaI6fY5jmTXXJH55uuZdeZvY" });
 const SECRET = "puedesercualquiercontraseña";
-
-// Middleware para verificar JWT
-function verifyToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader)
-    return res.status(401).json({ message: "Token requerido" });
-  const parts = authHeader.split(" ");
-  if (parts.length !== 2 || parts[0] !== "Bearer")
-    return res.status(403).json({ message: "Formato de token inválido" });
-  const token = parts[1]; 
-  jwt.verify(token, SECRET, (err, decoded) => {
-    if (err)
-      return res.status(403).json({ message: "Token inválido" });
-    req.user = decoded;
-    next();
-  });
-}
-
 
 // Registro
 app.post("/api/register", async (req, res) => {
@@ -74,7 +56,7 @@ app.post("/api/login", async (req, res) => {
     if (!validPass)
       return res.status(400).json({ message: "Contraseña incorrecta" });
 
-// Token
+    // Token
     const token = jwt.sign(
       {
         id: user.id,
@@ -82,12 +64,12 @@ app.post("/api/login", async (req, res) => {
         correo: user.mail
       },
       SECRET,
-      { expiresIn: "2h" } 
+      { expiresIn: "2h" }
     );
 
-    res.json({ 
+    res.json({
       message: "Login exitoso",
-      token 
+      token
     });
 
   } catch (err) {
@@ -95,18 +77,40 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// Gemini
+
+//MIDDLEWARE PARA AUTENTICAR
+function verifyToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader)
+    return res.status(401).json({ message: "Token requerido" });
+
+  const parts = authHeader.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Bearer")
+    return res.status(403).json({ message: "Formato de token inválido" });
+
+  const token = parts[1];
+
+  jwt.verify(token, SECRET, (err, decoded) => {
+    if (err)
+      return res.status(403).json({ message: "Token inválido" });
+
+    req.user = decoded;
+    next();
+  });
+}
+
+//TODO LO QUE ESTE ABAJO REQUIERE TOKEN
+app.use(verifyToken);
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-
 function cleanGeminiResponse(text) {
   return text
     .replace(/```javascript|```js|```/g, "")
     .trim();
 }
 
-app.post("/api/analyze-pdf", verifyToken, upload.single("pdfFile"), async (req, res) => {
+app.post("/api/analyze-pdf", upload.single("pdfFile"), async (req, res) => {
   try {
     if (!req.file)
       return res.status(400).json({ error: "No se subió ningún archivo PDF." });
@@ -117,21 +121,14 @@ app.post("/api/analyze-pdf", verifyToken, upload.single("pdfFile"), async (req, 
 
     const prompt = `
       A partir del contenido del PDF, responde ÚNICAMENTE con código JavaScript válido.
-      No incluyas explicaciones, ni texto adicional, ni comillas de plantilla. 
+      No incluyas explicaciones, ni texto adicional, ni comillas de plantilla.
 
       Genera las siguientes constantes:
 
-      juego1: arreglo con [palabraClave, pista] - NO INCLUYAS ACENTOS
-      juego2: arreglo de 8 palabras clave - NO INCLUYAS NUMEROS
-      juego3: matriz 8x2 con [[palabra, pista], ...] - NO INCLUYAS NUMEROS, PALABRAS DE MAXIMO 9
-      juego4: arreglo donde el primer valor es un párrafo completo y los siguientes 5 valores
-      son 5 palabras clave dentro del párrafo 
-
-      Formato:
-      const juego1 = [...];
-      const juego2 = [...];
-      const juego3 = [...];
-      const juego4 = [...];
+      juego1: arreglo con [palabraClave, pista]
+      juego2: arreglo de 8 palabras clave
+      juego3: matriz 8x2 con [[palabra, pista], ...]
+      juego4: arreglo donde el primer valor es un párrafo y los siguientes 5 palabras clave
     `;
 
     const response = await ai.models.generateContent({
@@ -152,43 +149,33 @@ app.post("/api/analyze-pdf", verifyToken, upload.single("pdfFile"), async (req, 
       ],
     });
 
-    let geminiRaw = response.candidates[0].content.parts[0].text;
-
-    const cleaned = cleanGeminiResponse(geminiRaw);
+    const raw = response.candidates[0].content.parts[0].text;
+    const cleaned = cleanGeminiResponse(raw);
 
     const scope = {};
     const fn = new Function(
       "scope",
-      `"use strict"; ${cleaned}; Object.assign(scope,{juego1,juego2,juego3,juego4});`
+      `"use strict"; ${cleaned}; Object.assign(scope, { juego1, juego2, juego3, juego4 });`
     );
 
     fn(scope);
 
-    const finalData = {
+    return res.status(200).json({
       ahorcado: scope.juego1,
       sopaDeLetras: scope.juego2,
       crucigrama: scope.juego3,
       completarFrase: scope.juego4,
-    };
-
-    console.log("Ahorcado:", scope.juego1);
-    console.log("Sopa de letras:", scope.juego2);
-    console.log("Crucigrama:", scope.juego3);
-    console.log("Completar frase:", scope.juego4);
-
-    return res.status(200).json(finalData);
+    });
 
   } catch (error) {
     console.error("ERROR GENERAL:", error);
-    const msg = error?.body?.error?.message || error.message;
     return res.status(500).json({
       error: "Error procesando la solicitud.",
-      detalle: msg
+      detalle: error.message,
     });
   }
 });
 
-// Iniciar
 app.listen(3000, () =>
   console.log("API escuchando en http://localhost:3000")
 );
